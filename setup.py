@@ -19,7 +19,7 @@ extension = Extension(
 
 setup(
     name='vtfunc',
-    version='0.1.0',
+    version='0.1.1',
     description='',
     url='https://github.com/coleifer/sqlite-vtfunc',
     author='Charles Leifer',
