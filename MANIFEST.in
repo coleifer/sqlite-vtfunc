@@ -1,0 +1,3 @@
+include vtfunc.pyx
+include LICENSE
+include README.md

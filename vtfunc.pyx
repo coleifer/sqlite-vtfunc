@@ -1,6 +1,7 @@
 from cpython.object cimport PyObject
 from cpython.ref cimport Py_INCREF, Py_DECREF
-from libc.stdlib cimport free, malloc
+from libc.float cimport DBL_MAX
+from libc.stdlib cimport free, malloc, rand
 from libc.string cimport memcpy
 from libc.string cimport memset
 
@@ -23,7 +24,8 @@ cdef struct sqlite3_index_constraint_usage:
 
 
 cdef extern from "sqlite3.h":
-    ctypedef struct sqlite3
+    ctypedef struct sqlite3:
+        int busyTimeout
     ctypedef struct sqlite3_context
     ctypedef struct sqlite3_value
     ctypedef long long sqlite3_int64
@@ -150,16 +152,14 @@ cdef extern from "sqlite3.h":
     cdef void* sqlite3_malloc(int)
     cdef void sqlite3_free(void *)
 
-
-cdef extern from "pysqlite/connection.h":
-    # Extract the underlying database handle from a Python connection object.
-    ctypedef struct pysqlite_Connection:
-        sqlite3 *db
+    # Misc.
+    cdef int sqlite3_busy_handler(sqlite3 *db, int(*)(void *, int), void *)
+    cdef int sqlite3_sleep(int ms)
 
 
 ctypedef struct peewee_vtab:
     sqlite3_vtab base
-    void *table_func
+    void *table_func_cls
 
 
 ctypedef struct peewee_cursor:
@@ -174,19 +174,19 @@ cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
                    sqlite3_vtab **ppVtab, char **pzErr) with gil:
     cdef:
         int rc
+        object table_func_cls = <object>pAux
         peewee_vtab *pNew
-        _TableFunction table_func = <_TableFunction>pAux
 
     rc = sqlite3_declare_vtab(
         db,
-        'CREATE TABLE x(%s);' % table_func.get_table_columns_declaration())
+        'CREATE TABLE x(%s);' % table_func_cls.get_table_columns_declaration())
     if rc == SQLITE_OK:
         pNew = <peewee_vtab *>sqlite3_malloc(sizeof(pNew[0]))
         memset(<char *>pNew, 0, sizeof(pNew[0]))
         ppVtab[0] = &(pNew.base)
 
-        pNew.table_func = <void *>table_func
-        Py_INCREF(table_func)
+        pNew.table_func_cls = <void *>table_func_cls
+        Py_INCREF(table_func_cls)
 
     return rc
 
@@ -194,30 +194,35 @@ cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
 cdef int pwDisconnect(sqlite3_vtab *pBase) with gil:
     cdef:
         peewee_vtab *pVtab = <peewee_vtab *>pBase
-        _TableFunction table_func = <_TableFunction>pVtab.table_func
+        object table_func_cls = <object>(pVtab.table_func_cls)
 
-    Py_DECREF(table_func)
+    Py_DECREF(table_func_cls)
     sqlite3_free(pVtab)
     return SQLITE_OK
 
 
-cdef int pwOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor):
+cdef int pwOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) with gil:
     cdef:
         peewee_vtab *pVtab = <peewee_vtab *>pBase
         peewee_cursor *pCur
+        object table_func_cls = <object>pVtab.table_func_cls
 
     pCur = <peewee_cursor *>sqlite3_malloc(sizeof(pCur[0]))
     memset(<char *>pCur, 0, sizeof(pCur[0]))
     ppCursor[0] = &(pCur.base)
     pCur.idx = 0
-    pCur.table_func = pVtab.table_func
+    table_func = table_func_cls()
+    Py_INCREF(table_func)
+    pCur.table_func = <void *>table_func
     pCur.stopped = False
     return SQLITE_OK
 
 
-cdef int pwClose(sqlite3_vtab_cursor *pBase):
+cdef int pwClose(sqlite3_vtab_cursor *pBase) with gil:
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
+        object table_func = <object>pCur.table_func
+    Py_DECREF(table_func)
     sqlite3_free(pCur)
     return SQLITE_OK
 
@@ -225,14 +230,14 @@ cdef int pwClose(sqlite3_vtab_cursor *pBase):
 cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
-        _TableFunction table_func = <_TableFunction>pCur.table_func
+        object table_func = <object>pCur.table_func
         tuple result
 
     if pCur.row_data:
         Py_DECREF(<tuple>pCur.row_data)
 
     try:
-        result = table_func.next_func(pCur.idx)
+        result = table_func.iterate(pCur.idx)
     except StopIteration:
         pCur.stopped = True
     except:
@@ -280,14 +285,14 @@ cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
     return SQLITE_OK
 
 
-cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid) with gil:
+cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
     pRowid[0] = <sqlite3_int64>pCur.idx
     return SQLITE_OK
 
 
-cdef int pwEof(sqlite3_vtab_cursor *pBase) with gil:
+cdef int pwEof(sqlite3_vtab_cursor *pBase):
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
     if pCur.stopped:
@@ -299,16 +304,26 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
                   const char *idxStr, int argc, sqlite3_value **argv) with gil:
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
-        _TableFunction table_func = <_TableFunction>pCur.table_func
-        params = str(idxStr).split(',')
+        object table_func = <object>pCur.table_func
         dict query = {}
         int idx
         int value_type
         tuple row_data
         void *row_data_raw
 
+    if not idxStr or argc == 0 and len(table_func.params):
+        return SQLITE_ERROR
+    elif idxStr:
+        params = str(idxStr).split(',')
+    else:
+        params = []
+
     for idx, param in enumerate(params):
         value = argv[idx]
+        if not value:
+            query[param] = None
+            continue
+
         value_type = sqlite3_value_type(value)
         if value_type == SQLITE_INTEGER:
             query[param] = sqlite3_value_int(value)
@@ -323,11 +338,16 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
         else:
             query[param] = None
 
-    table_func.init_func(**query)
-    row_data = table_func.next_func(0)
-    Py_INCREF(row_data)
-    pCur.row_data = <void *>row_data
-    sqlite3_free(idxStr)
+    table_func.initialize(**query)
+    pCur.stopped = False
+    try:
+        row_data = table_func.iterate(0)
+    except StopIteration:
+        pCur.stopped = True
+    else:
+        Py_INCREF(row_data)
+        pCur.row_data = <void *>row_data
+        pCur.idx += 1
     return SQLITE_OK
 
 
@@ -337,10 +357,11 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         int i
         int idxNum = 0, nArg = 0
         peewee_vtab *pVtab = <peewee_vtab *>pBase
-        _TableFunction table_func = <_TableFunction>pVtab.table_func
+        object table_func_cls = <object>pVtab.table_func_cls
         sqlite3_index_constraint *pConstraint
         list columns = []
         char *idxStr
+        int nParams = len(table_func_cls.params)
 
     pConstraint = <sqlite3_index_constraint*>0
     for i in range(pIdxInfo.nConstraint):
@@ -350,39 +371,48 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         if pConstraint.op != SQLITE_INDEX_CONSTRAINT_EQ:
             continue
 
-        columns.append(table_func.param_names[pConstraint.iColumn - 1])
+        columns.append(table_func_cls.params[pConstraint.iColumn - 1])
         nArg += 1
         pIdxInfo.aConstraintUsage[i].argvIndex = nArg
         pIdxInfo.aConstraintUsage[i].omit = 1
 
-    # Both start and stop are specified. This is preferable.
-    pIdxInfo.estimatedCost = <double>1
-    pIdxInfo.estimatedRows = 1000
-    joinedCols = ','.join(columns)
-    idxStr = <char *>sqlite3_malloc(len(joinedCols) * sizeof(char))
-    memcpy(idxStr, <char *>joinedCols, len(joinedCols))
-    pIdxInfo.idxStr = idxStr
+    if nArg > 0:
+        if nArg == nParams:
+            # All parameters are present, this is ideal.
+            pIdxInfo.estimatedCost = <double>1
+            pIdxInfo.estimatedRows = 10
+        else:
+            # Penalize score based on number of missing params.
+            pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)
+            pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
+        joinedCols = ','.join(columns)
+        idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
+        memcpy(idxStr, <char *>joinedCols, len(joinedCols))
+        idxStr[len(joinedCols)] = '\x00'
+        pIdxInfo.idxStr = idxStr
+        pIdxInfo.needToFreeIdxStr = 0
+    else:
+        pIdxInfo.estimatedCost = DBL_MAX
+        pIdxInfo.estimatedRows = 100000
     return SQLITE_OK
 
 
-cdef class _TableFunction(object):
+cdef class _TableFunctionImpl(object):
     cdef:
-        object init_func
-        object next_func
-        list param_names
-        list column_names
-        int row_length
-        str name
         sqlite3_module module
+        object table_function
 
-    def __cinit__(self, init_func, next_func, param_names, column_names=None,
-                  row_length=None, name=None):
-        self.init_func = init_func
-        self.next_func = next_func
-        self.param_names = param_names
-        self.column_names = column_names or ['result']
-        self.row_length = row_length or len(self.column_names)
-        self.name = name or type(self).__name__.lower()
+    def __cinit__(self, table_function):
+        self.table_function = table_function
+
+    def __dealloc__(self):
+        Py_DECREF(self)
+
+    cdef create_module(self, sqlite_conn):
+        cdef:
+            long ptr = sqlite_conn.sqlite3_pointer()
+            sqlite3 *db = <sqlite3 *>ptr
+            int rc
 
         # Populate the SQLite module struct members.
         self.module.iVersion = 0
@@ -406,34 +436,14 @@ cdef class _TableFunction(object):
         self.module.xFindFunction = NULL
         self.module.xRename = NULL
 
-    cdef char* get_table_columns_declaration(self):
-        cdef list accum = []
-
-        for column in self.column_names:
-            if isinstance(column, tuple):
-                if len(column) != 2:
-                    raise ValueError('Column must be either a string or a '
-                                     '2-tuple of name, type')
-                accum.append('%s %s' % column)
-            else:
-                accum.append(column)
-
-        for param in self.param_names:
-            accum.append('%s HIDDEN' % param)
-
-        return ', '.join(accum)
-
-    cpdef bint create_module(self, sqlite_conn):
-        cdef:
-            pysqlite_Connection *conn = <pysqlite_Connection *>sqlite_conn
-            sqlite3 *db = conn.db
-            int rc
-
         rc = sqlite3_create_module(
             db,
-            <const char *>self.name,
+            <const char *>self.table_function.name,
             &self.module,
-            <void *>self)
+            <void *>(self.table_function))
+
+        Py_INCREF(self)
+
         return rc == SQLITE_OK
 
 
@@ -459,20 +469,64 @@ class TableFunction(object):
     params = None
     name = None
 
-    def __init__(self):
-        self._table_func = _TableFunction(
-            self.initialize,
-            self.iterate,
-            self.params,
-            self.columns,
-            row_length=len(self.columns),
-            name=self.name or type(self).__name__)
-
-    def register(self, conn):
-        self._table_func.create_module(conn)
+    @classmethod
+    def register(cls, conn):
+        cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
+        impl.create_module(conn)
 
     def initialize(self, **filters):
         raise NotImplementedError
 
     def iterate(self, idx):
         raise NotImplementedError
+
+    @classmethod
+    def get_table_columns_declaration(cls):
+        cdef list accum = []
+
+        for column in cls.columns:
+            if isinstance(column, tuple):
+                if len(column) != 2:
+                    raise ValueError('Column must be either a string or a '
+                                     '2-tuple of name, type')
+                accum.append('%s %s' % column)
+            else:
+                accum.append(column)
+
+        for param in cls.params:
+            accum.append('%s HIDDEN' % param)
+
+        return ', '.join(accum)
+
+
+def aggressive_busy_handler(sqlite_conn, timeout=5000):
+    cdef:
+        int n = timeout
+        long ptr = sqlite_conn.sqlite3_pointer()
+        sqlite3 *db = <sqlite3 *>ptr
+
+    sqlite3_busy_handler(db, _aggressive_busy_handler, <void *>n)
+    return True
+
+
+cdef int _aggressive_busy_handler(void *ptr, int n):
+    cdef:
+        int busyTimeout = <int>ptr
+        int current, total
+
+    if n < 20:
+        current = 25 - (rand() % 10)  # ~20ms
+        total = n * 20
+    elif n < 40:
+        current = 50 - (rand() % 20)  # ~40ms
+        total = 400 + ((n - 20) * 40)
+    else:
+        current = 120 - (rand() % 40)  # ~100ms
+        total = 1200 + ((n - 40) * 100)
+
+    if total + current > busyTimeout:
+        current = busyTimeout - total
+    if current > 0:
+        sqlite3_sleep(current)
+        return 1
+    return 0
