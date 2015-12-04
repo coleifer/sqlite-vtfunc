@@ -359,8 +359,9 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
     pIdxInfo.estimatedCost = <double>1
     pIdxInfo.estimatedRows = 1000
     joinedCols = ','.join(columns)
-    idxStr = <char *>sqlite3_malloc(len(joinedCols) * sizeof(char))
+    idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
     memcpy(idxStr, <char *>joinedCols, len(joinedCols))
+    idxStr[len(joinedCols)] = '\x00'
     pIdxInfo.idxStr = idxStr
     return SQLITE_OK
 
