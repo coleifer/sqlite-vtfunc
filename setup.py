@@ -21,6 +21,7 @@ setup(
     name='vtfunc',
     version='0.1.0',
     description='',
+    url='https://github.com/coleifer/sqlite-vtfunc',
     author='Charles Leifer',
     author_email='',
     ext_modules=cythonize(extension),
