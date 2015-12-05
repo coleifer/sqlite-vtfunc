@@ -324,10 +324,13 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
             query[param] = None
 
     table_func.init_func(**query)
-    row_data = table_func.next_func(0)
-    Py_INCREF(row_data)
-    pCur.row_data = <void *>row_data
-    sqlite3_free(idxStr)
+    try:
+        row_data = table_func.next_func(0)
+    except StopIteration:
+        pCur.stopped = True
+    else:
+        Py_INCREF(row_data)
+        pCur.row_data = <void *>row_data
     return SQLITE_OK
 
 
@@ -363,6 +366,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
     memcpy(idxStr, <char *>joinedCols, len(joinedCols))
     idxStr[len(joinedCols)] = '\x00'
     pIdxInfo.idxStr = idxStr
+    pIdxInfo.needToFreeIdxStr = 1
     return SQLITE_OK
 
 
