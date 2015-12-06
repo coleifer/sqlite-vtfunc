@@ -300,12 +300,16 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
         _TableFunction table_func = <_TableFunction>pCur.table_func
-        params = str(idxStr).split(',')
         dict query = {}
         int idx
         int value_type
         tuple row_data
         void *row_data_raw
+
+    if not idxStr:
+        return SQLITE_OK
+    else:
+        params = str(idxStr).split(',')
 
     for idx, param in enumerate(params):
         value = argv[idx]
@@ -364,14 +368,18 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         pIdxInfo.aConstraintUsage[i].omit = 1
 
     # Both start and stop are specified. This is preferable.
-    pIdxInfo.estimatedCost = <double>1
-    pIdxInfo.estimatedRows = 1000
-    joinedCols = ','.join(columns)
-    idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
-    memcpy(idxStr, <char *>joinedCols, len(joinedCols))
-    idxStr[len(joinedCols)] = '\x00'
-    pIdxInfo.idxStr = idxStr
-    pIdxInfo.needToFreeIdxStr = 1
+    if columns:
+        pIdxInfo.estimatedCost = <double>1
+        pIdxInfo.estimatedRows = 1000
+        joinedCols = ','.join(columns)
+        idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
+        memcpy(idxStr, <char *>joinedCols, len(joinedCols))
+        idxStr[len(joinedCols)] = '\x00'
+        pIdxInfo.idxStr = idxStr
+        pIdxInfo.needToFreeIdxStr = 1
+    else:
+        pIdxInfo.estimatedCost = <double>2000000
+        pIdxInfo.estimatedRows = 1000
     return SQLITE_OK
 
 

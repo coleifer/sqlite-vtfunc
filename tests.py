@@ -72,6 +72,21 @@ class TestTableFunction(unittest.TestCase):
         self.assertEqual([row for row, in curs.fetchall()],
                          ['and', 'hello', 'huey'])
 
+    def test_split_tbl(self):
+        split.register(self.conn)
+        self.conn.execute('create table post (content TEXT);')
+        self.conn.execute('insert into post (content) values (?), (?), (?)',
+                          ('huey secret post',
+                           'mickey message',
+                           'zaizee diary'))
+        curs = self.conn.execute('SELECT * FROM post, str_split(post.content)')
+        results = curs.fetchall()
+        self.assertEqual(results, [
+            ('huey secret post', 'huey'),
+            ('huey secret post', 'secret'),
+            ('huey secret post', 'post'),
+        ])
+
     def test_series(self):
         series.register(self.conn)
 
