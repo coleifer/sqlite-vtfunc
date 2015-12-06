@@ -55,3 +55,27 @@ query_params = ('[0-9]+', '123 xxx 456 yyy 789 zzz 0')
 cursor = conn.execute('SELECT * FROM regex_search(?, ?);', query_params)
 print cursor.fetchall()
 ```
+
+Let's say we have a table that contains a list of arbitrary messages and we want to capture all the e-mail addresses from that table. This is also easy using our table-valued function. We will query the `messages` table and pass the message body into our table-valued function. Then, for each email address we find, we'll return a row containing the message ID and the matching email address:
+
+```python
+
+email_regex = '[\w]+@[\w]+\.[\w]{2,3}'  # Stupid simple email regex.
+query = ('SELECT messages.id, regex_search.match '
+         'FROM messages, regex_search(?, messages.body)')
+cursor = conn.execute(query, (email_regex,))
+```
+
+The resulting rows will look something like:
+
+```
+
+message id |         email
+-----------+-----------------------
+     1     | charlie@example.com
+     1     | huey@kitty.cat
+     1     | zaizee@morekitties.cat
+     3     | mickey@puppies.dog
+     3     | huey@throwaway.cat
+    ...    |         ...
+```
