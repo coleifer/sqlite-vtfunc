@@ -332,6 +332,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
             query[param] = None
 
     table_func.init_func(**query)
+    pCur.stopped = False
     try:
         row_data = table_func.next_func(0)
     except StopIteration:

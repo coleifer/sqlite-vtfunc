@@ -46,10 +46,13 @@ class Split(TableFunction):
 
     def initialize(self, data=None):
         self._parts = data.split()
+        self._idx = 0
 
     def iterate(self, idx):
-        if idx < len(self._parts):
-            return (self._parts[idx],)
+        if self._idx < len(self._parts):
+            result = (self._parts[self._idx],)
+            self._idx += 1
+            return result
         raise StopIteration
 
 
@@ -85,6 +88,10 @@ class TestTableFunction(unittest.TestCase):
             ('huey secret post', 'huey'),
             ('huey secret post', 'secret'),
             ('huey secret post', 'post'),
+            ('mickey message', 'mickey'),
+            ('mickey message', 'message'),
+            ('zaizee diary', 'zaizee'),
+            ('zaizee diary', 'diary'),
         ])
 
     def test_series(self):
