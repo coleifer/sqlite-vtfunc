@@ -331,6 +331,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
     else:
         Py_INCREF(row_data)
         pCur.row_data = <void *>row_data
+        pCur.idx += 1
     return SQLITE_OK
 
 
