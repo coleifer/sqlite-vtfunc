@@ -39,8 +39,23 @@ class RegexSearch(TableFunction):
         return (next(self._iter).group(0),)
 
 
+class Split(TableFunction):
+    params = ['data']
+    columns = ['part']
+    name = 'str_split'
+
+    def initialize(self, data=None):
+        self._parts = data.split()
+
+    def iterate(self, idx):
+        if idx < len(self._parts):
+            return (self._parts[idx],)
+        raise StopIteration
+
+
 series = Series()
 regex_search = RegexSearch()
+split = Split()
 
 
 class TestTableFunction(unittest.TestCase):
@@ -49,6 +64,13 @@ class TestTableFunction(unittest.TestCase):
 
     def tearDown(self):
         self.conn.close()
+
+    def test_split(self):
+        split.register(self.conn)
+        curs = self.conn.execute('select part from str_split(?) order by part '
+                                 'limit 3', ('well hello huey and zaizee',))
+        self.assertEqual([row for row, in curs.fetchall()],
+                         ['and', 'hello', 'huey'])
 
     def test_series(self):
         series.register(self.conn)

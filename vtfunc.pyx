@@ -309,6 +309,10 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
 
     for idx, param in enumerate(params):
         value = argv[idx]
+        if not value:
+            query[param] = None
+            continue
+
         value_type = sqlite3_value_type(value)
         if value_type == SQLITE_INTEGER:
             query[param] = sqlite3_value_int(value)
