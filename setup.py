@@ -13,15 +13,15 @@ pysqlite = glob.glob('pysqlite/*.c')
 
 extension = Extension(
     'vtfunc',
-    extra_compile_args=['-g'],
-    extra_link_args=['-g'],
+    #extra_compile_args=['-g'],
+    #extra_link_args=['-g'],
     define_macros=[('MODULE_NAME', '"vtfunc"')],
     libraries=['python2.7', 'sqlite3'],
     sources=[python_source] + pysqlite)
 
 setup(
     name='vtfunc',
-    version='0.1.2',
+    version='0.1.3',
     description='',
     url='https://github.com/coleifer/sqlite-vtfunc',
     author='Charles Leifer',
