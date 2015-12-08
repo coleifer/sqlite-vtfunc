@@ -371,16 +371,16 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
     # Both start and stop are specified. This is preferable.
     if columns:
         pIdxInfo.estimatedCost = <double>1
-        pIdxInfo.estimatedRows = 1000
+        pIdxInfo.estimatedRows = 10
         joinedCols = ','.join(columns)
         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
         memcpy(idxStr, <char *>joinedCols, len(joinedCols))
         idxStr[len(joinedCols)] = '\x00'
         pIdxInfo.idxStr = idxStr
-        pIdxInfo.needToFreeIdxStr = 1
+        pIdxInfo.needToFreeIdxStr = 0
     else:
-        pIdxInfo.estimatedCost = <double>2000000
-        pIdxInfo.estimatedRows = 1000
+        pIdxInfo.estimatedCost = <double>2000000000
+        pIdxInfo.estimatedRows = 100000
     return SQLITE_OK
 
 

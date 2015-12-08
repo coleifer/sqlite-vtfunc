@@ -117,6 +117,19 @@ class TestTableFunction(unittest.TestCase):
         assertSeries((3, 5, 3), [3])
         assertSeries((3, 3, 1), [3])
 
+    def test_series_tbl(self):
+        series.register(self.conn)
+        self.conn.execute('CREATE TABLE nums (id INTEGER PRIMARY KEY)')
+        self.conn.execute('INSERT INTO nums DEFAULT VALUES;')
+        self.conn.execute('INSERT INTO nums DEFAULT VALUES;')
+        curs = self.conn.execute(
+            'SELECT * FROM '
+            'nums, series(nums.id, nums.id + 2)')
+        results = curs.fetchall()
+        self.assertEqual(results, [
+            (1, 1), (1, 2), (1, 3),
+            (2, 2), (2, 3), (2, 4)])
+
     def test_regex(self):
         regex_search.register(self.conn)
 
