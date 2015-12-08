@@ -79,3 +79,22 @@ message id |         email
      3     | huey@throwaway.cat
     ...    |         ...
 ```
+
+#### Important note
+
+In the above example you will note that the parameters for our query actually change (because each row in the messages table has a different search string). This means that for this particular query, the `RegexSearch.initialize()` function will be called once for each row in the `messages` table.
+
+### How it works
+
+Behind-the-scenes, `vtfunc` is creating a [Virtual Table](http://sqlite.org/vtab.html) and filling in the various callbacks with wrappers around your user-defined function. There are two important methods that the wrapped virtual table implements:
+
+* xBestIndex
+* xFilter
+
+When SQLite attempts to execute a query, it will call the xBestIndex method of the virtual table (possibly multiple times) trying to come up with the best query plan. The `vtfunc` module optimizes for those query plans which include values for all the parameters of the user-defined function. Since some user-defined functions may have optional parameters, query plans with only a subset of param values will be slightly penalized.
+
+Since we have no visibility into what parameters the user *actually* passed in, and we don't know ahead of time which query plan SQLite suggests will be best, `vtfunc` just does its best to optimize for plans with the highest number of usable parameter values.
+
+If you encounter a situation where you pass your function multiple parameters, but it doesn't receive all of them, it's the case that a less-than-optimal plan was used.
+
+After the plan is chosen by calling xBestIndex, the query will execute by calling xFilter (possibly multiple times). xFilter has access to the actual query parameters, and it's responsibility is to initialize the cursor and call the user's initialize() callback with the parameters passed in.

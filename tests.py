@@ -123,8 +123,7 @@ class TestTableFunction(unittest.TestCase):
         self.conn.execute('INSERT INTO nums DEFAULT VALUES;')
         self.conn.execute('INSERT INTO nums DEFAULT VALUES;')
         curs = self.conn.execute(
-            'SELECT * FROM '
-            'nums, series(nums.id, nums.id + 2)')
+            'SELECT * FROM nums, series(nums.id, nums.id + 2)')
         results = curs.fetchall()
         self.assertEqual(results, [
             (1, 1), (1, 2), (1, 3),
@@ -155,6 +154,30 @@ class TestTableFunction(unittest.TestCase):
             '[0-9]+',
             'hello',
             [])
+
+    def test_regex_tbl(self):
+        messages = (
+            'hello foo@example.fap, this is nuggie@example.fap. How are you?',
+            'baz@example.com wishes to let charlie@crappyblog.com know that '
+            'huey@example.com hates his blog',
+            'testing no emails.',
+            '')
+        regex_search.register(self.conn)
+
+        self.conn.execute('create table posts (id integer primary key, msg)')
+        self.conn.execute('insert into posts (msg) values (?), (?), (?), (?)',
+                          messages)
+        cur = self.conn.execute('select posts.id, regex_search.match '
+                                'FROM posts, regex_search(?, posts.msg)',
+                                ('[\w]+@[\w]+\.\w{2,3}',))
+        results = cur.fetchall()
+        self.assertEqual(results, [
+            (1, 'foo@example.fap'),
+            (1, 'nuggie@example.fap'),
+            (2, 'baz@example.com'),
+            (2, 'charlie@crappyblog.com'),
+            (2, 'huey@example.com'),
+        ])
 
 
 if __name__ == '__main__':

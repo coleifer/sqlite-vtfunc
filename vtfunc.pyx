@@ -280,14 +280,14 @@ cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
     return SQLITE_OK
 
 
-cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid) with gil:
+cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
     pRowid[0] = <sqlite3_int64>pCur.idx
     return SQLITE_OK
 
 
-cdef int pwEof(sqlite3_vtab_cursor *pBase) with gil:
+cdef int pwEof(sqlite3_vtab_cursor *pBase):
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
     if pCur.stopped:
@@ -306,10 +306,12 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
         tuple row_data
         void *row_data_raw
 
-    if not idxStr:
-        return SQLITE_OK
-    else:
+    if not idxStr or argc == 0 and len(table_func.param_names):
+        return SQLITE_ERROR
+    elif idxStr:
         params = str(idxStr).split(',')
+    else:
+        params = []
 
     for idx, param in enumerate(params):
         value = argv[idx]
@@ -347,6 +349,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
 cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         with gil:
     cdef:
+        double huge_cost = 2000000000000
         int i
         int idxNum = 0, nArg = 0
         peewee_vtab *pVtab = <peewee_vtab *>pBase
@@ -354,6 +357,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         sqlite3_index_constraint *pConstraint
         list columns = []
         char *idxStr
+        int nParams = len(table_func.param_names)
 
     pConstraint = <sqlite3_index_constraint*>0
     for i in range(pIdxInfo.nConstraint):
@@ -368,10 +372,15 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         pIdxInfo.aConstraintUsage[i].argvIndex = nArg
         pIdxInfo.aConstraintUsage[i].omit = 1
 
-    # Both start and stop are specified. This is preferable.
-    if columns:
-        pIdxInfo.estimatedCost = <double>1
-        pIdxInfo.estimatedRows = 10
+    if nArg > 0:
+        if nArg == nParams:
+            # All parameters are present, this is ideal.
+            pIdxInfo.estimatedCost = <double>1
+            pIdxInfo.estimatedRows = 10
+        else:
+            # Penalize score based on number of missing params.
+            pIdxInfo.estimatedCost = <double>10 * <double>(nParams - nArg)
+            pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
         joinedCols = ','.join(columns)
         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
         memcpy(idxStr, <char *>joinedCols, len(joinedCols))
@@ -379,7 +388,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         pIdxInfo.idxStr = idxStr
         pIdxInfo.needToFreeIdxStr = 0
     else:
-        pIdxInfo.estimatedCost = <double>2000000000
+        pIdxInfo.estimatedCost = huge_cost
         pIdxInfo.estimatedRows = 100000
     return SQLITE_OK
 
