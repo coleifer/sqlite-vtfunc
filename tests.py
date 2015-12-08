@@ -129,6 +129,11 @@ class TestTableFunction(unittest.TestCase):
             (1, 1), (1, 2), (1, 3),
             (2, 2), (2, 3), (2, 4)])
 
+        curs = self.conn.execute(
+            'SELECT * FROM nums, series(nums.id) LIMIT 3')
+        results = curs.fetchall()
+        self.assertEqual(results, [(1, 1), (1, 2), (1, 3)])
+
     def test_regex(self):
         regex_search.register(self.conn)
 
