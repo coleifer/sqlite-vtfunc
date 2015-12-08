@@ -16,7 +16,7 @@ extension = Extension(
     #extra_compile_args=['-g'],
     #extra_link_args=['-g'],
     define_macros=[('MODULE_NAME', '"vtfunc"')],
-    libraries=['python2.7', 'sqlite3'],
+    libraries=['sqlite3'],
     sources=[python_source] + pysqlite)
 
 setup(
