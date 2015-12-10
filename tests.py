@@ -172,16 +172,16 @@ class TestTableFunction(unittest.TestCase):
         self.conn.execute('create table posts (id integer primary key, msg)')
         self.conn.execute('insert into posts (msg) values (?), (?), (?), (?)',
                           messages)
-        cur = self.conn.execute('select posts.id, regex_search.match '
+        cur = self.conn.execute('select posts.id, regex_search.rowid, regex_search.match '
                                 'FROM posts, regex_search(?, posts.msg)',
                                 ('[\w]+@[\w]+\.\w{2,3}',))
         results = cur.fetchall()
         self.assertEqual(results, [
-            (1, 'foo@example.fap'),
-            (1, 'nuggie@example.fap'),
-            (2, 'baz@example.com'),
-            (2, 'charlie@crappyblog.com'),
-            (2, 'huey@example.com'),
+            (1, 1, 'foo@example.fap'),
+            (1, 2, 'nuggie@example.fap'),
+            (2, 3, 'baz@example.com'),
+            (2, 4, 'charlie@crappyblog.com'),
+            (2, 5, 'huey@example.com'),
         ])
 
 
