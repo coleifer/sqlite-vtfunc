@@ -48,8 +48,7 @@ import sqlite3
 
 conn = sqlite3.connect(':memory:')  # Create an in-memory database.
 
-search_module = RegexSearch()
-search_module.register(conn)  # Register our module.
+RegexSearch.register(conn)  # Register our module.
 
 query_params = ('[0-9]+', '123 xxx 456 yyy 789 zzz 0')
 cursor = conn.execute('SELECT * FROM regex_search(?, ?);', query_params)
