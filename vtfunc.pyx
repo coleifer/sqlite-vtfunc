@@ -159,7 +159,7 @@ cdef extern from "pysqlite/connection.h":
 
 ctypedef struct peewee_vtab:
     sqlite3_vtab base
-    void *table_func
+    void *table_func_cls
 
 
 ctypedef struct peewee_cursor:
@@ -174,19 +174,19 @@ cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
                    sqlite3_vtab **ppVtab, char **pzErr) with gil:
     cdef:
         int rc
+        object table_func_cls = <object>pAux
         peewee_vtab *pNew
-        _TableFunction table_func = <_TableFunction>pAux
 
     rc = sqlite3_declare_vtab(
         db,
-        'CREATE TABLE x(%s);' % table_func.get_table_columns_declaration())
+        'CREATE TABLE x(%s);' % table_func_cls.get_table_columns_declaration())
     if rc == SQLITE_OK:
         pNew = <peewee_vtab *>sqlite3_malloc(sizeof(pNew[0]))
         memset(<char *>pNew, 0, sizeof(pNew[0]))
         ppVtab[0] = &(pNew.base)
 
-        pNew.table_func = <void *>table_func
-        Py_INCREF(table_func)
+        pNew.table_func_cls = <void *>table_func_cls
+        Py_INCREF(table_func_cls)
 
     return rc
 
@@ -194,30 +194,35 @@ cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
 cdef int pwDisconnect(sqlite3_vtab *pBase) with gil:
     cdef:
         peewee_vtab *pVtab = <peewee_vtab *>pBase
-        _TableFunction table_func = <_TableFunction>pVtab.table_func
+        object table_func_cls = <object>(pVtab.table_func_cls)
 
-    Py_DECREF(table_func)
+    Py_DECREF(table_func_cls)
     sqlite3_free(pVtab)
     return SQLITE_OK
 
 
-cdef int pwOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor):
+cdef int pwOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) with gil:
     cdef:
         peewee_vtab *pVtab = <peewee_vtab *>pBase
         peewee_cursor *pCur
+        object table_func_cls = <object>pVtab.table_func_cls
 
     pCur = <peewee_cursor *>sqlite3_malloc(sizeof(pCur[0]))
     memset(<char *>pCur, 0, sizeof(pCur[0]))
     ppCursor[0] = &(pCur.base)
     pCur.idx = 0
-    pCur.table_func = pVtab.table_func
+    table_func = table_func_cls()
+    Py_INCREF(table_func)
+    pCur.table_func = <void *>table_func
     pCur.stopped = False
     return SQLITE_OK
 
 
-cdef int pwClose(sqlite3_vtab_cursor *pBase):
+cdef int pwClose(sqlite3_vtab_cursor *pBase) with gil:
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
+        object table_func = <object>pCur.table_func
+    Py_DECREF(table_func)
     sqlite3_free(pCur)
     return SQLITE_OK
 
@@ -225,14 +230,14 @@ cdef int pwClose(sqlite3_vtab_cursor *pBase):
 cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
-        _TableFunction table_func = <_TableFunction>pCur.table_func
+        object table_func = <object>pCur.table_func
         tuple result
 
     if pCur.row_data:
         Py_DECREF(<tuple>pCur.row_data)
 
     try:
-        result = table_func.next_func(pCur.idx)
+        result = table_func.iterate(pCur.idx)
     except StopIteration:
         pCur.stopped = True
     except:
@@ -299,14 +304,14 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
                   const char *idxStr, int argc, sqlite3_value **argv) with gil:
     cdef:
         peewee_cursor *pCur = <peewee_cursor *>pBase
-        _TableFunction table_func = <_TableFunction>pCur.table_func
+        object table_func = <object>pCur.table_func
         dict query = {}
         int idx
         int value_type
         tuple row_data
         void *row_data_raw
 
-    if not idxStr or argc == 0 and len(table_func.param_names):
+    if not idxStr or argc == 0 and len(table_func.params):
         return SQLITE_ERROR
     elif idxStr:
         params = str(idxStr).split(',')
@@ -333,10 +338,10 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
         else:
             query[param] = None
 
-    table_func.init_func(**query)
+    table_func.initialize(**query)
     pCur.stopped = False
     try:
-        row_data = table_func.next_func(0)
+        row_data = table_func.iterate(0)
     except StopIteration:
         pCur.stopped = True
     else:
@@ -353,11 +358,11 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         int i
         int idxNum = 0, nArg = 0
         peewee_vtab *pVtab = <peewee_vtab *>pBase
-        _TableFunction table_func = <_TableFunction>pVtab.table_func
+        object table_func_cls = <object>pVtab.table_func_cls
         sqlite3_index_constraint *pConstraint
         list columns = []
         char *idxStr
-        int nParams = len(table_func.param_names)
+        int nParams = len(table_func_cls.params)
 
     pConstraint = <sqlite3_index_constraint*>0
     for i in range(pIdxInfo.nConstraint):
@@ -367,7 +372,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         if pConstraint.op != SQLITE_INDEX_CONSTRAINT_EQ:
             continue
 
-        columns.append(table_func.param_names[pConstraint.iColumn - 1])
+        columns.append(table_func_cls.params[pConstraint.iColumn - 1])
         nArg += 1
         pIdxInfo.aConstraintUsage[i].argvIndex = nArg
         pIdxInfo.aConstraintUsage[i].omit = 1
@@ -393,24 +398,22 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
     return SQLITE_OK
 
 
-cdef class _TableFunction(object):
+cdef class _TableFunctionImpl(object):
     cdef:
-        object init_func
-        object next_func
-        list param_names
-        list column_names
-        int row_length
-        str name
         sqlite3_module module
+        object table_function
 
-    def __cinit__(self, init_func, next_func, param_names, column_names=None,
-                  row_length=None, name=None):
-        self.init_func = init_func
-        self.next_func = next_func
-        self.param_names = param_names
-        self.column_names = column_names or ['result']
-        self.row_length = row_length or len(self.column_names)
-        self.name = name or type(self).__name__.lower()
+    def __cinit__(self, table_function):
+        self.table_function = table_function
+
+    def __dealloc__(self):
+        Py_DECREF(self)
+
+    cdef create_module(self, sqlite_conn):
+        cdef:
+            pysqlite_Connection *conn = <pysqlite_Connection *>sqlite_conn
+            sqlite3 *db = conn.db
+            int rc
 
         # Populate the SQLite module struct members.
         self.module.iVersion = 0
@@ -434,34 +437,14 @@ cdef class _TableFunction(object):
         self.module.xFindFunction = NULL
         self.module.xRename = NULL
 
-    cdef char* get_table_columns_declaration(self):
-        cdef list accum = []
-
-        for column in self.column_names:
-            if isinstance(column, tuple):
-                if len(column) != 2:
-                    raise ValueError('Column must be either a string or a '
-                                     '2-tuple of name, type')
-                accum.append('%s %s' % column)
-            else:
-                accum.append(column)
-
-        for param in self.param_names:
-            accum.append('%s HIDDEN' % param)
-
-        return ', '.join(accum)
-
-    cpdef bint create_module(self, sqlite_conn):
-        cdef:
-            pysqlite_Connection *conn = <pysqlite_Connection *>sqlite_conn
-            sqlite3 *db = conn.db
-            int rc
-
         rc = sqlite3_create_module(
             db,
-            <const char *>self.name,
+            <const char *>self.table_function.name,
             &self.module,
-            <void *>self)
+            <void *>(self.table_function))
+
+        Py_INCREF(self)
+
         return rc == SQLITE_OK
 
 
@@ -487,20 +470,31 @@ class TableFunction(object):
     params = None
     name = None
 
-    def __init__(self):
-        self._table_func = _TableFunction(
-            self.initialize,
-            self.iterate,
-            self.params,
-            self.columns,
-            row_length=len(self.columns),
-            name=self.name or type(self).__name__)
-
-    def register(self, conn):
-        self._table_func.create_module(conn)
+    @classmethod
+    def register(cls, conn):
+        cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
+        impl.create_module(conn)
 
     def initialize(self, **filters):
         raise NotImplementedError
 
     def iterate(self, idx):
         raise NotImplementedError
+
+    @classmethod
+    def get_table_columns_declaration(cls):
+        cdef list accum = []
+
+        for column in cls.columns:
+            if isinstance(column, tuple):
+                if len(column) != 2:
+                    raise ValueError('Column must be either a string or a '
+                                     '2-tuple of name, type')
+                accum.append('%s %s' % column)
+            else:
+                accum.append(column)
+
+        for param in cls.params:
+            accum.append('%s HIDDEN' % param)
+
+        return ', '.join(accum)
