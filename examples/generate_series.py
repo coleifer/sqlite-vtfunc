@@ -25,8 +25,7 @@ class GenerateSeries(TableFunction):
 
 conn = sqlite3.connect(':memory:')
 
-series = GenerateSeries()
-series.register(conn)
+GenerateSeries.register(conn)
 
 cursor = conn.execute('SELECT * FROM series(0, 10, 2)')
 print cursor.fetchall()

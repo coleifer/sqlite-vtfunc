@@ -20,8 +20,7 @@ class RegexSearch(TableFunction):
 conn = sqlite3.connect(':memory:')
 
 # Register the module with the connection.
-rgx_module = RegexSearch()
-rgx_module.register(conn)
+RegexSearch.register(conn)
 
 # Query the module.
 query_params = ('[0-9]+', '1337 foo 567 bar 999 baz 0123')

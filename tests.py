@@ -62,11 +62,6 @@ class Split(TableFunction):
         raise StopIteration
 
 
-series = Series()
-regex_search = RegexSearch()
-split = Split()
-
-
 class TestTableFunction(unittest.TestCase):
     def setUp(self):
         self.conn = sqlite3.connect(':memory:')
@@ -75,14 +70,14 @@ class TestTableFunction(unittest.TestCase):
         self.conn.close()
 
     def test_split(self):
-        split.register(self.conn)
+        Split.register(self.conn)
         curs = self.conn.execute('select part from str_split(?) order by part '
                                  'limit 3', ('well hello huey and zaizee',))
         self.assertEqual([row for row, in curs.fetchall()],
                          ['and', 'hello', 'huey'])
 
     def test_split_tbl(self):
-        split.register(self.conn)
+        Split.register(self.conn)
         self.conn.execute('create table post (content TEXT);')
         self.conn.execute('insert into post (content) values (?), (?), (?)',
                           ('huey secret post',
@@ -101,7 +96,7 @@ class TestTableFunction(unittest.TestCase):
         ])
 
     def test_series(self):
-        series.register(self.conn)
+        Series.register(self.conn)
 
         def assertSeries(params, values, extra_sql=''):
             param_sql = ', '.join('?' * len(params))
@@ -118,7 +113,7 @@ class TestTableFunction(unittest.TestCase):
         assertSeries((3, 3, 1), [3])
 
     def test_series_tbl(self):
-        series.register(self.conn)
+        Series.register(self.conn)
         self.conn.execute('CREATE TABLE nums (id INTEGER PRIMARY KEY)')
         self.conn.execute('INSERT INTO nums DEFAULT VALUES;')
         self.conn.execute('INSERT INTO nums DEFAULT VALUES;')
@@ -135,7 +130,7 @@ class TestTableFunction(unittest.TestCase):
         self.assertEqual(results, [(1, 1), (1, 2), (1, 3)])
 
     def test_regex(self):
-        regex_search.register(self.conn)
+        RegexSearch.register(self.conn)
 
         def assertResults(regex, search_string, values):
             sql = 'SELECT * FROM regex_search(?, ?)'
@@ -167,7 +162,7 @@ class TestTableFunction(unittest.TestCase):
             'huey@example.com hates his blog',
             'testing no emails.',
             '')
-        regex_search.register(self.conn)
+        RegexSearch.register(self.conn)
 
         self.conn.execute('create table posts (id integer primary key, msg)')
         self.conn.execute('insert into posts (msg) values (?), (?), (?), (?)',
