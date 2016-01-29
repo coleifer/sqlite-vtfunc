@@ -1,5 +1,6 @@
 from cpython.object cimport PyObject
 from cpython.ref cimport Py_INCREF, Py_DECREF
+from libc.float cimport DBL_MAX
 from libc.stdlib cimport free, malloc
 from libc.string cimport memcpy
 from libc.string cimport memset
@@ -354,7 +355,6 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
 cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         with gil:
     cdef:
-        double huge_cost = 2000000000000
         int i
         int idxNum = 0, nArg = 0
         peewee_vtab *pVtab = <peewee_vtab *>pBase
@@ -384,7 +384,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
             pIdxInfo.estimatedRows = 10
         else:
             # Penalize score based on number of missing params.
-            pIdxInfo.estimatedCost = <double>10 * <double>(nParams - nArg)
+            pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)
             pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
         joinedCols = ','.join(columns)
         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
@@ -393,7 +393,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         pIdxInfo.idxStr = idxStr
         pIdxInfo.needToFreeIdxStr = 0
     else:
-        pIdxInfo.estimatedCost = huge_cost
+        pIdxInfo.estimatedCost = DBL_MAX
         pIdxInfo.estimatedRows = 100000
     return SQLITE_OK
 
