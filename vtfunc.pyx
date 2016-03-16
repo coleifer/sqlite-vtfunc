@@ -1,7 +1,7 @@
 from cpython.object cimport PyObject
 from cpython.ref cimport Py_INCREF, Py_DECREF
 from libc.float cimport DBL_MAX
-from libc.stdlib cimport free, malloc
+from libc.stdlib cimport free, malloc, rand
 from libc.string cimport memcpy
 from libc.string cimport memset
 
@@ -24,7 +24,8 @@ cdef struct sqlite3_index_constraint_usage:
 
 
 cdef extern from "sqlite3.h":
-    ctypedef struct sqlite3
+    ctypedef struct sqlite3:
+        int busyTimeout
     ctypedef struct sqlite3_context
     ctypedef struct sqlite3_value
     ctypedef long long sqlite3_int64
@@ -150,6 +151,10 @@ cdef extern from "sqlite3.h":
     # Memory management.
     cdef void* sqlite3_malloc(int)
     cdef void sqlite3_free(void *)
+
+    # Misc.
+    cdef int sqlite3_busy_handler(sqlite3 *db, int(*)(void *, int), void *)
+    cdef int sqlite3_sleep(int ms)
 
 
 cdef extern from "pysqlite/connection.h":
@@ -498,3 +503,35 @@ class TableFunction(object):
             accum.append('%s HIDDEN' % param)
 
         return ', '.join(accum)
+
+
+def aggressive_busy_handler(sqlite_conn, timeout=5000):
+    cdef:
+        pysqlite_Connection *conn = <pysqlite_Connection *>sqlite_conn
+        int n = timeout
+
+    sqlite3_busy_handler(conn.db, _aggressive_busy_handler, <void *>n)
+    return True
+
+
+cdef int _aggressive_busy_handler(void *ptr, int n):
+    cdef:
+        int busyTimeout = <int>ptr
+        int current, total
+
+    if n < 20:
+        current = 25 - (rand() % 10)  # ~20ms
+        total = n * 20
+    elif n < 40:
+        current = 50 - (rand() % 20)  # ~40ms
+        total = 400 + ((n - 20) * 40)
+    else:
+        current = 120 - (rand() % 40)  # ~100ms
+        total = 1200 + ((n - 40) * 100)
+
+    if total + current > busyTimeout:
+        current = busyTimeout - total
+    if current > 0:
+        sqlite3_sleep(current)
+        return 1
+    return 0
