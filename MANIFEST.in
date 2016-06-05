@@ -1,5 +1,3 @@
 include vtfunc.pyx
-include pysqlite/*.c
-include pysqlite/*.h
 include LICENSE
 include README.md
