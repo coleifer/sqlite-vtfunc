@@ -1,8 +1,8 @@
 import re
-import sqlite3
 import sys
 import unittest
 
+from pysqlite2 import dbapi2 as sqlite3
 from vtfunc import TableFunction
 
 

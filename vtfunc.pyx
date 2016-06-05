@@ -503,9 +503,8 @@ def aggressive_busy_handler(sqlite_conn, timeout=5000):
     cdef:
         int n = timeout
         long ptr = sqlite_conn.sqlite3_pointer()
-        sqlite3 *db
+        sqlite3 *db = <sqlite3 *>ptr
 
-    db = <sqlite3 *>ptr
     sqlite3_busy_handler(db, _aggressive_busy_handler, <void *>n)
     return True
 
