@@ -96,6 +96,7 @@ cdef extern from "sqlite3.h":
     cdef int SQLITE_OK = 0
     cdef int SQLITE_ERROR = 1
     cdef int SQLITE_NOMEM = 7
+    cdef int SQLITE_OK_LOAD_PERMANENTLY = 256  # SQLite >= 3.14.
 
     # Types of filtering operations.
     cdef int SQLITE_INDEX_CONSTRAINT_EQ = 2
@@ -159,15 +160,15 @@ cdef extern from "sqlite3.h":
 
 ctypedef struct peewee_vtab:
     sqlite3_vtab base
-    void *table_func_cls
+    void *table_func_cls  # Pointer to the user-defined table function.
 
 
 ctypedef struct peewee_cursor:
     sqlite3_vtab_cursor base
     long long idx
-    void *table_func
-    void *row_data
-    bint stopped
+    void *table_func  # Pointer to the table function.
+    void *row_data  # Pointer to the current row data.
+    bint stopped  # Did we run out of results?
 
 
 cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
@@ -183,7 +184,7 @@ cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
     if rc == SQLITE_OK:
         pNew = <peewee_vtab *>sqlite3_malloc(sizeof(pNew[0]))
         memset(<char *>pNew, 0, sizeof(pNew[0]))
-        ppVtab[0] = &(pNew.base)
+        ppVtab[0] = &(pNew.base)  # Point ppVtab at our custom vtab struct.
 
         pNew.table_func_cls = <void *>table_func_cls
         Py_INCREF(table_func_cls)
@@ -417,7 +418,7 @@ cdef class _TableFunctionImpl(object):
 
         # Populate the SQLite module struct members.
         self.module.iVersion = 0
-        self.module.xCreate = NULL
+        self.module.xCreate = NULL  # NULL indicates eponymous *only*.
         self.module.xConnect = pwConnect
         self.module.xBestIndex = pwBestIndex
         self.module.xDisconnect = pwDisconnect
