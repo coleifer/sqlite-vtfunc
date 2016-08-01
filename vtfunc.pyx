@@ -371,7 +371,8 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         if pConstraint.op != SQLITE_INDEX_CONSTRAINT_EQ:
             continue
 
-        columns.append(table_func_cls.params[pConstraint.iColumn - 1])
+        columns.append(table_func_cls.params[pConstraint.iColumn -
+                                             table_func_cls._ncols])
         nArg += 1
         pIdxInfo.aConstraintUsage[i].argvIndex = nArg
         pIdxInfo.aConstraintUsage[i].omit = 1
@@ -468,11 +469,13 @@ class TableFunction(object):
     columns = None
     params = None
     name = None
+    _ncols = None
 
     @classmethod
     def register(cls, conn):
         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
         impl.create_module(conn)
+        cls._ncols = len(cls.columns)
 
     def initialize(self, **filters):
         raise NotImplementedError
