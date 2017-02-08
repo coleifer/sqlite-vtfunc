@@ -5,21 +5,8 @@ using Python.
 
 ### Dependencies
 
-This project depends on a personal fork of `pysqlite2`. Currently the
-pysqlite2 bindings do not provide a way to access the pointer to the sqlite3
-database connection (APSW, on the other hand, has a sqlite3pointer method).
-
-By modifying `pysqlite2` to include a `sqlite3_pointer()` method, it is
-possible to write Python libraries that interact with SQLite's C APIs, via the
-`pysqlite2.Connection` object.
-
-If you install with `pip` or run `setup.py install` on the source of this
-project, then the dependency will be built automatically. To build it yourself,
-clone the following repository:
-
-    git clone https://github.com/coleifer/pysqlite
-
-Then run the usual `setup.py install`.
+This project is designed to work with the standard library `sqlite3` driver, or
+alternatively, the latest version of `pysqlite2`.
 
 ### Rationale
 

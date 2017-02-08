@@ -158,6 +158,11 @@ cdef extern from "sqlite3.h":
     cdef int sqlite3_sleep(int ms)
 
 
+cdef extern from "_pysqlite/connection.h":
+    ctypedef struct pysqlite_Connection:
+        sqlite3 *db
+
+
 ctypedef struct peewee_vtab:
     sqlite3_vtab base
     void *table_func_cls  # Pointer to the user-defined table function.
@@ -410,10 +415,9 @@ cdef class _TableFunctionImpl(object):
     def __dealloc__(self):
         Py_DECREF(self)
 
-    cdef create_module(self, sqlite_conn):
+    cdef create_module(self, pysqlite_Connection* sqlite_conn):
         cdef:
-            long ptr = sqlite_conn.sqlite3_pointer()
-            sqlite3 *db = <sqlite3 *>ptr
+            sqlite3 *db = sqlite_conn.db
             int rc
 
         # Populate the SQLite module struct members.
@@ -475,7 +479,7 @@ class TableFunction(object):
     @classmethod
     def register(cls, conn):
         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
-        impl.create_module(conn)
+        impl.create_module(<pysqlite_Connection *>conn)
         cls._ncols = len(cls.columns)
 
     def initialize(self, **filters):
@@ -506,8 +510,7 @@ class TableFunction(object):
 def aggressive_busy_handler(sqlite_conn, timeout=5000):
     cdef:
         int n = timeout
-        long ptr = sqlite_conn.sqlite3_pointer()
-        sqlite3 *db = <sqlite3 *>ptr
+        sqlite3 *db = (<pysqlite_Connection *>sqlite_conn).db
 
     sqlite3_busy_handler(db, _aggressive_busy_handler, <void *>n)
     return True
