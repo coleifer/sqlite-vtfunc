@@ -1,20 +1,150 @@
 ## vtfunc
 
-Implement SQLite [table-valued functions](http://sqlite.org/vtab.html#tabfunc2)
-using Python.
+Python bindings for the creation of [table-valued functions](http://sqlite.org/vtab.html#tabfunc2)
+in SQLite.
+
+A table-valued function:
+
+* Accepts any number of parameters
+* Can be used in places you would put a normal table or subquery, such as the
+  `FROM` clause or on the right-hand-side of an `IN` expression.
+* may return an arbitrary number of rows consisting of one or more columns.
+
+Here are some examples of what you can do with Python and `sqlite-vtfunc`:
+
+* Write a SELECT query that, when run, will scrape a website and return a table
+  of all the outbound links on the page (rows are `(href, description)`
+  tuples. [See example below](#scraping-pages-with-sql)).
+* Accept a file path and return a table of the files in that directory and
+  their associated metadata.
+* Use table-valued functions to handle recurring events in a calendaring
+  application (by generating the series of recurrances dynamically).
+* Apply a regular expression search to some text and return a row for each
+  matching substring.
+
+### Scraping pages with SQL
+
+To get an idea of how `sqlite-vtfunc` works, let's build the scraper table
+function described in the previous section. The function will accept a URL as
+the only parameter, and will return a table of the link destinations and text
+descriptions.
+
+The `Scraper` class contains the entire implementation for the scraper:
+
+```python
+
+import re, urllib2
+
+from pysqlite2 import dbapi2 as sqlite3  # Use forked pysqlite.
+from vtfunc import TableFunction
+
+
+class Scraper(TableFunction):
+    params = ['url']  # Function argument names.
+    columns = ['href', 'description']  # Result rows have these columns.
+    name = 'scraper'  # Name we use to invoke the function from SQL.
+
+    def initialize(self, url):
+        # When the function is called, download the HTML and create an
+        # iterator that successively yields `href`/`description` pairs.
+        fh = urllib2.urlopen(url)
+        self.html = fh.read()
+        self._iter = re.finditer(
+            '<a[^\>]+?href="([^\"]+?)"[^\>]*?>([^\<]+?)</a>',
+            self.html)
+
+    def iterate(self, idx):
+        # Since row ids would not be meaningful for this particular table-
+        # function, we can ignore "idx" and just advance the regex iterator.
+
+        # Ordinarily, to signal that there are no more rows, the `iterate()`
+        # method must raise a `StopIteration` exception. This is not necessary
+        # here because `next()` will raise the exception when the regex
+        # iterator is finished.
+        return next(self._iter).groups()
+```
+
+To start using the table function, create a connection and register the table
+function with the connection. **Note**: for SQLite version <= 3.13, the table
+function will not remain loaded across connections, so it is necessary to
+register it each time you connect to the database.
+
+```python
+
+# Creating a connection and registering our scraper function.
+conn = sqlite3.connect(':memory:')
+Scraper.register(conn)  # Register the function with the new connection.
+```
+
+To test the scraper, start up a python interpreter and enter the above code.
+Once that is done, let's try a query. The following query will fetch the HTML
+for the hackernews front-page and extract the three links with the longest
+descriptions:
+
+```pycon
+>>> curs = conn.execute('SELECT * FROM scraper(?) '
+...                     'ORDER BY length(description) DESC '
+...                     'LIMIT 3', ('https://news.ycombinator.com/',))
+
+>>> for (href, description) in curs.fetchall():
+...     print description, ':', href
+
+The Diolkos: an ancient Greek paved trackway enabling boats to be moved overland : https://...
+The NumPy array: a structure for efficient numerical computation (2011) [pdf] : https://hal...
+Restoring Y Combinator's Xerox Alto, day 4: What's running on the system : http://www.right...
+```
+
+Now, suppose you have another table which contains a huge list of URLs that you
+need to scrape. Since this is a relational database, it's incredibly easy to
+connect the URLs in one table with another.
+
+The following query will scrape all the URLs in the `unvisited_urls` table:
+
+```sql
+
+SELECT uu.url, href, description
+FROM unvisited_urls AS uu, scraper(uu.url)
+ORDER BY uu.url, href, description;
+```
+
+### Example two: implementing Python's range()
+
+This function generates a series of integers between given boundaries and at
+given intervals.
+
+```python
+
+from vtfunc import TableFunction
+
+
+class GenerateSeries(TableFunction):
+    params = ['start', 'stop', 'step']
+    columns = ['output']
+    name = 'generate_series'
+
+    def initialize(self, start=0, stop=None, step=1):
+        # Note that when a parameter is optional, the only thing
+        # you need to do is provide a default value in `initialize()`.
+        self.start = start
+        self.stop = stop or float('inf')
+        self.step = step
+        self.curr = self.start
+
+    def iterate(self, idx):
+        if self.curr > self.stop:
+            raise StopIteration
+
+        ret = self.curr
+        self.curr += self.step
+        return (ret,)
+```
 
 ### Dependencies
 
 This project is designed to work with the standard library `sqlite3` driver, or
 alternatively, the latest version of `pysqlite2`.
 
-### Rationale
-
-SQLite makes it easy to define scalar and aggregate functions, but it is more
-challenging to create functions that return multiple values. Scalar functions
-accept zero or more parameters and return a single value. Aggregate functions
-accept parameters from any number of input rows, and then generate a final
-scalar value.
+### Implementation Notes
 
 To create functions that return multiple values, it is necessary to create a
 [virtual table](http://sqlite.org/vtab.html). SQLite has the concept of
@@ -25,19 +155,7 @@ The `vtfunc` module abstracts away the complexity of creating an eponymous
 virtual table, allowing you to write your own multi-value SQLite functions in
 Python.
 
-### Example
-
-Suppose we want to create a function that, given a regular expression and an
-input string, returns all matching subgroups in the input string. For instance,
-if our regex was `'[0-9]+'` and our input string was `'123 xxx 456 yyy
-789 zzz 0'`, the function should return four rows:
-
-* `123`
-* `456`
-* `789`
-* `0`
-
-With the `vtab` module it is very easy to implement this:
+# TODO: was removing stuff and stopped here.
 
 ```python
 import re
