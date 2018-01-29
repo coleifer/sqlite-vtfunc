@@ -1,5 +1,20 @@
 ## vtfunc
 
+**NOTICE**: This project is no longer necessary if you are using Peewee 3.0 or
+newer, as the relevant code has been included in Peewee's sqlite extension
+module. For more information, see:
+
+* [Peewee user-defined function examples](http://docs.peewee-orm.com/en/latest/peewee/database.html#user-defined-functions)
+* [TableFunction API documentation](http://docs.peewee-orm.com/en/latest/peewee/sqlite_ext.html#TableFunction)
+* [Table function registration API](http://docs.peewee-orm.com/en/latest/peewee/api.html#SqliteDatabase.table_function)
+* [General SQLite extensions documentation](http://docs.peewee-orm.com/en/latest/peewee/sqlite_ext.html)
+
+If you intend to use this project with an older version of Peewee, or as a
+standalone project with the standard library SQLite module, feel free to
+continue using this repository.
+
+--------------------------------------------------------------------------
+
 Python bindings for the creation of [table-valued functions](http://sqlite.org/vtab.html#tabfunc2)
 in SQLite.
 
