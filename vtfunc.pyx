@@ -163,6 +163,24 @@ cdef extern from "_pysqlite/connection.h":
         sqlite3 *db
 
 
+cdef inline bytes encode(key):
+    cdef bytes bkey
+    if isinstance(key, unicode):
+        bkey = <bytes>key.encode('utf-8')
+    else:
+        bkey = <bytes>key
+    return bkey
+
+
+cdef inline unicode decode(key):
+    cdef unicode ukey
+    if isinstance(key, bytes):
+        ukey = <unicode>key.decode('utf-8')
+    else:
+        ukey = <unicode>key
+    return ukey
+
+
 ctypedef struct peewee_vtab:
     sqlite3_vtab base
     void *table_func_cls  # Pointer to the user-defined table function.
@@ -185,7 +203,8 @@ cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
 
     rc = sqlite3_declare_vtab(
         db,
-        'CREATE TABLE x(%s);' % table_func_cls.get_table_columns_declaration())
+        encode('CREATE TABLE x(%s);' %
+               table_func_cls.get_table_columns_declaration()))
     if rc == SQLITE_OK:
         pNew = <peewee_vtab *>sqlite3_malloc(sizeof(pNew[0]))
         memset(<char *>pNew, 0, sizeof(pNew[0]))
@@ -260,6 +279,7 @@ cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
 cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
                   int iCol) with gil:
     cdef:
+        bytes bval
         peewee_cursor *pCur = <peewee_cursor *>pBase
         sqlite3_int64 x = 0
         tuple row_data
@@ -277,15 +297,19 @@ cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
     elif isinstance(value, float):
         sqlite3_result_double(ctx, <double>value)
     elif isinstance(value, basestring):
+        bval = encode(value)
         sqlite3_result_text(
             ctx,
-            <const char *>value,
+            <const char *>bval,
             -1,
             <sqlite3_destructor_type>-1)
     elif isinstance(value, bool):
         sqlite3_result_int(ctx, int(value))
     else:
-        sqlite3_result_error(ctx, 'Unsupported type %s' % type(value), -1)
+        sqlite3_result_error(
+            ctx,
+            encode('Unsupported type %s' % type(value)),
+            -1)
         return SQLITE_ERROR
 
     return SQLITE_OK
@@ -320,7 +344,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
     if not idxStr or argc == 0 and len(table_func.params):
         return SQLITE_ERROR
     elif idxStr:
-        params = str(idxStr).split(',')
+        params = decode(idxStr).split(',')
     else:
         params = []
 
@@ -336,7 +360,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
         elif value_type == SQLITE_FLOAT:
             query[param] = sqlite3_value_double(value)
         elif value_type == SQLITE_TEXT:
-            query[param] = str(sqlite3_value_text(value))
+            query[param] = decode(sqlite3_value_text(value))
         elif value_type == SQLITE_BLOB:
             query[param] = <bytes>sqlite3_value_blob(value)
         elif value_type == SQLITE_NULL:
@@ -392,7 +416,7 @@ cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
             # Penalize score based on number of missing params.
             pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)
             pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
-        joinedCols = ','.join(columns)
+        joinedCols = encode(','.join(columns))
         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
         memcpy(idxStr, <char *>joinedCols, len(joinedCols))
         idxStr[len(joinedCols)] = '\x00'
@@ -412,11 +436,9 @@ cdef class _TableFunctionImpl(object):
     def __cinit__(self, table_function):
         self.table_function = table_function
 
-    def __dealloc__(self):
-        Py_DECREF(self)
-
     cdef create_module(self, pysqlite_Connection* sqlite_conn):
         cdef:
+            bytes name = encode(self.table_function.name)
             sqlite3 *db = sqlite_conn.db
             int rc
 
@@ -444,7 +466,7 @@ cdef class _TableFunctionImpl(object):
 
         rc = sqlite3_create_module(
             db,
-            <const char *>self.table_function.name,
+            <const char *>name,
             &self.module,
             <void *>(self.table_function))
 

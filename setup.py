@@ -1,14 +1,22 @@
 import glob
 import os
+import warnings
 
 from distutils.core import setup, Extension
 try:
     from Cython.Build import cythonize
 except ImportError:
-    import warnings
-    raise RuntimeError('Cython must be installed to build vtfunc.')
+    cython_installed = False
+    warnings.warn('Cython not installed, using pre-generated C source file.')
+else:
+    cython_installed = True
 
-python_source = 'vtfunc.pyx'
+if cython_installed:
+    python_source = 'vtfunc.pyx'
+else:
+    python_source = 'vtfunc.c'
+    cythonize = lambda obj: obj
+
 extension = Extension(
     'vtfunc',
     define_macros=[('MODULE_NAME', '"vtfunc"')],
@@ -26,5 +34,5 @@ setup(
     ],
     author='Charles Leifer',
     author_email='',
-    ext_modules=cythonize(extension),
+    ext_modules=cythonize([extension]),
 )
