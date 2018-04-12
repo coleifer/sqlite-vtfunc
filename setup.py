@@ -17,10 +17,10 @@ extension = Extension(
 
 setup(
     name='vtfunc',
-    version='0.2.2',
+    version='0.2.3',
     description='Tabular user-defined functions for SQLite3.',
     url='https://github.com/coleifer/sqlite-vtfunc',
-    install_requires=['pysqlite>=2.8.2', 'Cython'],
+    setup_requres=['cython'],
     dependency_links=[
         'https://github.com/coleifer/pysqlite/zipball/master#egg=pysqlite',
     ],
