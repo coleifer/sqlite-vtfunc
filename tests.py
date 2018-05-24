@@ -26,6 +26,13 @@ class Series(TableFunction):
         return (ret,)
 
 
+class BrokenSeries(Series):
+    name = 'broken'
+
+    def initialize(self, start=0, stop=None, step=1):
+        1 / 0
+
+
 class RegexSearch(TableFunction):
     columns = ['match']
     params = ['regex', 'search_string']
@@ -94,6 +101,11 @@ class TestTableFunction(unittest.TestCase):
             ('zaizee diary', 'zaizee'),
             ('zaizee diary', 'diary'),
         ])
+
+    def test_error_handling(self):
+        BrokenSeries.register(self.conn)
+        self.assertRaises(sqlite3.OperationalError, self.conn.execute,
+                          'SELECT * FROM broken(10)')
 
     def test_series(self):
         Series.register(self.conn)
