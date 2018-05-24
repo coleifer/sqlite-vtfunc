@@ -28,7 +28,6 @@ setup(
     version='0.3.2',
     description='Tabular user-defined functions for SQLite3.',
     url='https://github.com/coleifer/sqlite-vtfunc',
-    setup_requires=['cython'],
     dependency_links=[
         'https://github.com/coleifer/pysqlite/zipball/master#egg=pysqlite',
     ],
