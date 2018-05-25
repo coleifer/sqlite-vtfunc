@@ -25,4 +25,4 @@ RegexSearch.register(conn)
 # Query the module.
 query_params = ('[0-9]+', '123 foo 567 bar 999 baz 0123')
 cursor = conn.execute('SELECT * FROM regex_search(?, ?);', query_params)
-print cursor.fetchall()
+print(cursor.fetchall())

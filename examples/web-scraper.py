@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 import re
-import urllib2
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 import sqlite3
 from vtfunc import TableFunction
@@ -15,7 +18,7 @@ class Scraper(TableFunction):
     def initialize(self, url):
         self._iter = re.finditer(
             '<a[^\>]+?href="([^\"]+?)"[^\>]*?>([^\<]+?)</a>',
-            urllib2.urlopen(url).read())
+            urlopen(url).read().decode('utf-8'))
 
     def iterate(self, idx):
         return next(self._iter).groups()
@@ -33,7 +36,7 @@ cursor = conn.execute(
     'ORDER BY length(description) DESC LIMIT 3;',
     ('https://news.ycombinator.com',))
 for href, desc in cursor.fetchall():
-    print desc, ':', href
+    print(desc, ':', href)
 
 
 # Create a separate table that stores a list of URLs we need to scrape. Since
@@ -48,4 +51,4 @@ conn.execute('INSERT INTO url_list (url) VALUES (?), (?), (?);', (
 query = conn.execute('SELECT s.url, href, description FROM '
                      'url_list AS s, scraper(s.url)')
 for url, href, description in query:
-    print url, ' -- ', description, ':', href
+    print(url, ' -- ', description, ':', href)

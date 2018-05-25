@@ -27,7 +27,7 @@ conn = sqlite3.connect(':memory:')
 GenerateSeries.register(conn)
 
 cursor = conn.execute('SELECT * FROM series(0, 10, 2)')
-print cursor.fetchall()
+print(cursor.fetchall())
 
 cursor = conn.execute('SELECT * FROM series(5, NULL, 20) LIMIT 10')
-print cursor.fetchall()
+print(cursor.fetchall())
