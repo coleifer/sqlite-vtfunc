@@ -1,7 +1,7 @@
 from cpython.object cimport PyObject
 from cpython.ref cimport Py_INCREF, Py_DECREF
 from libc.float cimport DBL_MAX
-from libc.stdlib cimport free, malloc, rand
+from libc.stdlib cimport rand
 from libc.string cimport memcpy
 from libc.string cimport memset
 
