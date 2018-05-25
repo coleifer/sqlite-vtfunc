@@ -262,7 +262,7 @@ cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
         Py_DECREF(<tuple>pCur.row_data)
 
     try:
-        result = table_func.iterate(pCur.idx)
+        result = tuple(table_func.iterate(pCur.idx))
     except StopIteration:
         pCur.stopped = True
     except:
@@ -375,7 +375,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
 
     pCur.stopped = False
     try:
-        row_data = table_func.iterate(0)
+        row_data = tuple(table_func.iterate(0))
     except StopIteration:
         pCur.stopped = True
     except:
