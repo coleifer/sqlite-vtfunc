@@ -13,6 +13,8 @@ If you intend to use this project with an older version of Peewee, or as a
 standalone project with the standard library SQLite module, feel free to
 continue using this repository.
 
+Requires sqlite >= 3.9.0
+
 --------------------------------------------------------------------------
 
 Python bindings for the creation of [table-valued functions](http://sqlite.org/vtab.html#tabfunc2)
