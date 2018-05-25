@@ -1,3 +1,4 @@
-vtfunc.so
+vtfunc*.so
+vtfunc.c
 MANIFEST
 build/*
