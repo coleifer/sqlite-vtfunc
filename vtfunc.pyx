@@ -245,7 +245,8 @@ cdef int pwOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) with gil:
     try:
         table_func = table_func_cls()
     except:
-        traceback.print_exc()
+        if table_func_cls.print_tracebacks:
+            traceback.print_exc()
         sqlite3_free(pCur)
         return SQLITE_ERROR
 
@@ -279,7 +280,8 @@ cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
     except StopIteration:
         pCur.stopped = True
     except:
-        traceback.print_exc()
+        if table_func.print_tracebacks:
+            traceback.print_exc()
         return SQLITE_ERROR
     else:
         Py_INCREF(result)
@@ -386,7 +388,8 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
     try:
         table_func.initialize(**query)
     except:
-        traceback.print_exc()
+        if table_func.print_tracebacks:
+            traceback.print_exc()
         return SQLITE_ERROR
 
     pCur.stopped = False
@@ -395,7 +398,8 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
     except StopIteration:
         pCur.stopped = True
     except Exception as exc:
-        traceback.print_exc()
+        if table_func.print_tracebacks:
+            traceback.print_exc()
         return SQLITE_ERROR
     else:
         Py_INCREF(row_data)
@@ -519,6 +523,7 @@ class TableFunction(object):
     columns = None
     params = None
     name = None
+    print_tracebacks = True
     _ncols = None
 
     @classmethod

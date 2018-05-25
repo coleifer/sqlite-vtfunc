@@ -845,7 +845,7 @@ struct __pyx_t_6vtfunc_peewee_cursor {
   int stopped;
 };
 
-/* "vtfunc.pyx":454
+/* "vtfunc.pyx":458
  * 
  * 
  * cdef class _TableFunctionImpl(object):             # <<<<<<<<<<<<<<
@@ -1418,6 +1418,7 @@ static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_table_function[] = "table_function";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_CREATE_TABLE_x_s[] = "CREATE TABLE x(%s);";
+static const char __pyx_k_print_tracebacks[] = "print_tracebacks";
 static const char __pyx_k_Unsupported_type_s[] = "Unsupported type %s";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_NotImplementedError[] = "NotImplementedError";
@@ -1481,6 +1482,7 @@ static PyObject *__pyx_n_s_param;
 static PyObject *__pyx_n_s_params;
 static PyObject *__pyx_n_s_prepare;
 static PyObject *__pyx_n_s_print_exc;
+static PyObject *__pyx_n_s_print_tracebacks;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_qualname;
 static PyObject *__pyx_n_s_range;
@@ -2087,8 +2089,9 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
   PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
+  int __pyx_t_8;
   PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
   #ifdef WITH_THREAD
   PyGILState_STATE __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
   #endif
@@ -2172,7 +2175,7 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
  *     try:
  *         table_func = table_func_cls()             # <<<<<<<<<<<<<<
  *     except:
- *         traceback.print_exc()
+ *         if table_func_cls.print_tracebacks:
  */
       __Pyx_INCREF(__pyx_v_table_func_cls);
       __pyx_t_5 = __pyx_v_table_func_cls; __pyx_t_6 = NULL;
@@ -2217,8 +2220,8 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
  *     try:
  *         table_func = table_func_cls()
  *     except:             # <<<<<<<<<<<<<<
- *         traceback.print_exc()
- *         sqlite3_free(pCur)
+ *         if table_func_cls.print_tracebacks:
+ *             traceback.print_exc()
  */
     /*except:*/ {
       __Pyx_AddTraceback("vtfunc.pwOpen", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -2230,46 +2233,68 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
       /* "vtfunc.pyx":248
  *         table_func = table_func_cls()
  *     except:
- *         traceback.print_exc()             # <<<<<<<<<<<<<<
+ *         if table_func_cls.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         sqlite3_free(pCur)
+ */
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_print_tracebacks); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 248, __pyx_L5_except_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 248, __pyx_L5_except_error)
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (__pyx_t_8) {
+
+        /* "vtfunc.pyx":249
+ *     except:
+ *         if table_func_cls.print_tracebacks:
+ *             traceback.print_exc()             # <<<<<<<<<<<<<<
  *         sqlite3_free(pCur)
  *         return SQLITE_ERROR
  */
-      __pyx_t_8 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 248, __pyx_L5_except_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 248, __pyx_L5_except_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
-        if (likely(__pyx_t_8)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-          __Pyx_INCREF(__pyx_t_8);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_9, function);
+        __pyx_t_9 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 249, __pyx_L5_except_error)
+        __Pyx_GOTREF(__pyx_t_9);
+        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 249, __pyx_L5_except_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __pyx_t_9 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+          __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_10);
+          if (likely(__pyx_t_9)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+            __Pyx_INCREF(__pyx_t_9);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_10, function);
+          }
         }
-      }
-      if (__pyx_t_8) {
-        __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 248, __pyx_L5_except_error)
-        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      } else {
-        __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 248, __pyx_L5_except_error)
-      }
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        if (__pyx_t_9) {
+          __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 249, __pyx_L5_except_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        } else {
+          __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 249, __pyx_L5_except_error)
+        }
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "vtfunc.pyx":249
+        /* "vtfunc.pyx":248
+ *         table_func = table_func_cls()
  *     except:
- *         traceback.print_exc()
+ *         if table_func_cls.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         sqlite3_free(pCur)
+ */
+      }
+
+      /* "vtfunc.pyx":250
+ *         if table_func_cls.print_tracebacks:
+ *             traceback.print_exc()
  *         sqlite3_free(pCur)             # <<<<<<<<<<<<<<
  *         return SQLITE_ERROR
  * 
  */
       sqlite3_free(__pyx_v_pCur);
 
-      /* "vtfunc.pyx":250
- *         traceback.print_exc()
+      /* "vtfunc.pyx":251
+ *             traceback.print_exc()
  *         sqlite3_free(pCur)
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
  * 
@@ -2304,7 +2329,7 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
     __pyx_L8_try_end:;
   }
 
-  /* "vtfunc.pyx":252
+  /* "vtfunc.pyx":253
  *         return SQLITE_ERROR
  * 
  *     Py_INCREF(table_func)             # <<<<<<<<<<<<<<
@@ -2313,7 +2338,7 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
  */
   Py_INCREF(__pyx_v_table_func);
 
-  /* "vtfunc.pyx":253
+  /* "vtfunc.pyx":254
  * 
  *     Py_INCREF(table_func)
  *     pCur.table_func = <void *>table_func             # <<<<<<<<<<<<<<
@@ -2322,7 +2347,7 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
  */
   __pyx_v_pCur->table_func = ((void *)__pyx_v_table_func);
 
-  /* "vtfunc.pyx":254
+  /* "vtfunc.pyx":255
  *     Py_INCREF(table_func)
  *     pCur.table_func = <void *>table_func
  *     pCur.stopped = False             # <<<<<<<<<<<<<<
@@ -2331,7 +2356,7 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
  */
   __pyx_v_pCur->stopped = 0;
 
-  /* "vtfunc.pyx":255
+  /* "vtfunc.pyx":256
  *     pCur.table_func = <void *>table_func
  *     pCur.stopped = False
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -2355,8 +2380,8 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
   __Pyx_WriteUnraisable("vtfunc.pwOpen", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
@@ -2369,7 +2394,7 @@ static int __pyx_f_6vtfunc_pwOpen(sqlite3_vtab *__pyx_v_pBase, sqlite3_vtab_curs
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":258
+/* "vtfunc.pyx":259
  * 
  * 
  * cdef int pwClose(sqlite3_vtab_cursor *pBase) with gil:             # <<<<<<<<<<<<<<
@@ -2388,7 +2413,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
   #endif
   __Pyx_RefNannySetupContext("pwClose", 0);
 
-  /* "vtfunc.pyx":260
+  /* "vtfunc.pyx":261
  * cdef int pwClose(sqlite3_vtab_cursor *pBase) with gil:
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase             # <<<<<<<<<<<<<<
@@ -2397,7 +2422,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   __pyx_v_pCur = ((__pyx_t_6vtfunc_peewee_cursor *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":261
+  /* "vtfunc.pyx":262
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *         object table_func = <object>pCur.table_func             # <<<<<<<<<<<<<<
@@ -2409,7 +2434,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_v_table_func = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":262
+  /* "vtfunc.pyx":263
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *         object table_func = <object>pCur.table_func
  *     Py_DECREF(table_func)             # <<<<<<<<<<<<<<
@@ -2418,7 +2443,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   Py_DECREF(__pyx_v_table_func);
 
-  /* "vtfunc.pyx":263
+  /* "vtfunc.pyx":264
  *         object table_func = <object>pCur.table_func
  *     Py_DECREF(table_func)
  *     sqlite3_free(pCur)             # <<<<<<<<<<<<<<
@@ -2427,7 +2452,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   sqlite3_free(__pyx_v_pCur);
 
-  /* "vtfunc.pyx":264
+  /* "vtfunc.pyx":265
  *     Py_DECREF(table_func)
  *     sqlite3_free(pCur)
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -2437,7 +2462,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_r = SQLITE_OK;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":258
+  /* "vtfunc.pyx":259
  * 
  * 
  * cdef int pwClose(sqlite3_vtab_cursor *pBase) with gil:             # <<<<<<<<<<<<<<
@@ -2455,7 +2480,7 @@ static int __pyx_f_6vtfunc_pwClose(sqlite3_vtab_cursor *__pyx_v_pBase) {
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":267
+/* "vtfunc.pyx":268
  * 
  * 
  * cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:             # <<<<<<<<<<<<<<
@@ -2485,7 +2510,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
   #endif
   __Pyx_RefNannySetupContext("pwNext", 0);
 
-  /* "vtfunc.pyx":269
+  /* "vtfunc.pyx":270
  * cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase             # <<<<<<<<<<<<<<
@@ -2494,7 +2519,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   __pyx_v_pCur = ((__pyx_t_6vtfunc_peewee_cursor *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":270
+  /* "vtfunc.pyx":271
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *         object table_func = <object>pCur.table_func             # <<<<<<<<<<<<<<
@@ -2506,7 +2531,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_v_table_func = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":273
+  /* "vtfunc.pyx":274
  *         tuple result
  * 
  *     if pCur.row_data:             # <<<<<<<<<<<<<<
@@ -2516,7 +2541,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_t_2 = (__pyx_v_pCur->row_data != 0);
   if (__pyx_t_2) {
 
-    /* "vtfunc.pyx":274
+    /* "vtfunc.pyx":275
  * 
  *     if pCur.row_data:
  *         Py_DECREF(<tuple>pCur.row_data)             # <<<<<<<<<<<<<<
@@ -2528,7 +2553,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     Py_DECREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "vtfunc.pyx":273
+    /* "vtfunc.pyx":274
  *         tuple result
  * 
  *     if pCur.row_data:             # <<<<<<<<<<<<<<
@@ -2537,7 +2562,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   }
 
-  /* "vtfunc.pyx":276
+  /* "vtfunc.pyx":277
  *         Py_DECREF(<tuple>pCur.row_data)
  * 
  *     pCur.row_data = NULL             # <<<<<<<<<<<<<<
@@ -2546,7 +2571,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   __pyx_v_pCur->row_data = NULL;
 
-  /* "vtfunc.pyx":277
+  /* "vtfunc.pyx":278
  * 
  *     pCur.row_data = NULL
  *     try:             # <<<<<<<<<<<<<<
@@ -2562,16 +2587,16 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "vtfunc.pyx":278
+      /* "vtfunc.pyx":279
  *     pCur.row_data = NULL
  *     try:
  *         result = tuple(table_func.iterate(pCur.idx))             # <<<<<<<<<<<<<<
  *     except StopIteration:
  *         pCur.stopped = True
  */
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_iterate); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L4_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_iterate); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 279, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pCur->idx); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L4_error)
+      __pyx_t_7 = __Pyx_PyInt_From_PY_LONG_LONG(__pyx_v_pCur->idx); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 279, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_8 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -2584,14 +2609,14 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
         }
       }
       if (!__pyx_t_8) {
-        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L4_error)
+        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L4_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_GOTREF(__pyx_t_1);
       } else {
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-          __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L4_error)
+          __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L4_error)
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -2600,32 +2625,32 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-          __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L4_error)
+          __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L4_error)
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         } else
         #endif
         {
-          __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 278, __pyx_L4_error)
+          __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 279, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8); __pyx_t_8 = NULL;
           __Pyx_GIVEREF(__pyx_t_7);
           PyTuple_SET_ITEM(__pyx_t_9, 0+1, __pyx_t_7);
           __pyx_t_7 = 0;
-          __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L4_error)
+          __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L4_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L4_error)
+      __pyx_t_6 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 279, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_result = ((PyObject*)__pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "vtfunc.pyx":277
+      /* "vtfunc.pyx":278
  * 
  *     pCur.row_data = NULL
  *     try:             # <<<<<<<<<<<<<<
@@ -2634,7 +2659,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
     }
 
-    /* "vtfunc.pyx":285
+    /* "vtfunc.pyx":287
  *         return SQLITE_ERROR
  *     else:
  *         Py_INCREF(result)             # <<<<<<<<<<<<<<
@@ -2644,7 +2669,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     /*else:*/ {
       Py_INCREF(__pyx_v_result);
 
-      /* "vtfunc.pyx":286
+      /* "vtfunc.pyx":288
  *     else:
  *         Py_INCREF(result)
  *         pCur.row_data = <void *>result             # <<<<<<<<<<<<<<
@@ -2653,7 +2678,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
       __pyx_v_pCur->row_data = ((void *)__pyx_v_result);
 
-      /* "vtfunc.pyx":287
+      /* "vtfunc.pyx":289
  *         Py_INCREF(result)
  *         pCur.row_data = <void *>result
  *         pCur.idx += 1             # <<<<<<<<<<<<<<
@@ -2662,7 +2687,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
       __pyx_v_pCur->idx = (__pyx_v_pCur->idx + 1);
 
-      /* "vtfunc.pyx":288
+      /* "vtfunc.pyx":290
  *         pCur.row_data = <void *>result
  *         pCur.idx += 1
  *         pCur.stopped = False             # <<<<<<<<<<<<<<
@@ -2682,7 +2707,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "vtfunc.pyx":279
+    /* "vtfunc.pyx":280
  *     try:
  *         result = tuple(table_func.iterate(pCur.idx))
  *     except StopIteration:             # <<<<<<<<<<<<<<
@@ -2692,17 +2717,17 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     __pyx_t_10 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_StopIteration);
     if (__pyx_t_10) {
       __Pyx_AddTraceback("vtfunc.pwNext", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_1, &__pyx_t_9) < 0) __PYX_ERR(0, 279, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_1, &__pyx_t_9) < 0) __PYX_ERR(0, 280, __pyx_L6_except_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_9);
 
-      /* "vtfunc.pyx":280
+      /* "vtfunc.pyx":281
  *         result = tuple(table_func.iterate(pCur.idx))
  *     except StopIteration:
  *         pCur.stopped = True             # <<<<<<<<<<<<<<
  *     except:
- *         traceback.print_exc()
+ *         if table_func.print_tracebacks:
  */
       __pyx_v_pCur->stopped = 1;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -2711,55 +2736,77 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
       goto __pyx_L5_exception_handled;
     }
 
-    /* "vtfunc.pyx":281
+    /* "vtfunc.pyx":282
  *     except StopIteration:
  *         pCur.stopped = True
  *     except:             # <<<<<<<<<<<<<<
- *         traceback.print_exc()
- *         return SQLITE_ERROR
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()
  */
     /*except:*/ {
       __Pyx_AddTraceback("vtfunc.pwNext", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_9, &__pyx_t_1, &__pyx_t_6) < 0) __PYX_ERR(0, 281, __pyx_L6_except_error)
+      if (__Pyx_GetException(&__pyx_t_9, &__pyx_t_1, &__pyx_t_6) < 0) __PYX_ERR(0, 282, __pyx_L6_except_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_6);
 
-      /* "vtfunc.pyx":282
+      /* "vtfunc.pyx":283
  *         pCur.stopped = True
  *     except:
- *         traceback.print_exc()             # <<<<<<<<<<<<<<
+ *         if table_func.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         return SQLITE_ERROR
+ */
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_print_tracebacks); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L6_except_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 283, __pyx_L6_except_error)
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (__pyx_t_2) {
+
+        /* "vtfunc.pyx":284
+ *     except:
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()             # <<<<<<<<<<<<<<
  *         return SQLITE_ERROR
  *     else:
  */
-      __pyx_t_8 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 282, __pyx_L6_except_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 282, __pyx_L6_except_error)
-      __Pyx_GOTREF(__pyx_t_11);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
-        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_11);
-        if (likely(__pyx_t_8)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
-          __Pyx_INCREF(__pyx_t_8);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_11, function);
-        }
-      }
-      if (__pyx_t_8) {
-        __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 282, __pyx_L6_except_error)
+        __pyx_t_8 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L6_except_error)
+        __Pyx_GOTREF(__pyx_t_8);
+        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 284, __pyx_L6_except_error)
+        __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      } else {
-        __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_t_11); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 282, __pyx_L6_except_error)
-      }
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_t_8 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+          __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_11);
+          if (likely(__pyx_t_8)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+            __Pyx_INCREF(__pyx_t_8);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_11, function);
+          }
+        }
+        if (__pyx_t_8) {
+          __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 284, __pyx_L6_except_error)
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+        } else {
+          __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_t_11); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 284, __pyx_L6_except_error)
+        }
+        __Pyx_GOTREF(__pyx_t_7);
+        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "vtfunc.pyx":283
+        /* "vtfunc.pyx":283
+ *         pCur.stopped = True
  *     except:
- *         traceback.print_exc()
+ *         if table_func.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         return SQLITE_ERROR
+ */
+      }
+
+      /* "vtfunc.pyx":285
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
  *     else:
  *         Py_INCREF(result)
@@ -2772,7 +2819,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     }
     __pyx_L6_except_error:;
 
-    /* "vtfunc.pyx":277
+    /* "vtfunc.pyx":278
  * 
  *     pCur.row_data = NULL
  *     try:             # <<<<<<<<<<<<<<
@@ -2798,7 +2845,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
     __pyx_L9_try_end:;
   }
 
-  /* "vtfunc.pyx":290
+  /* "vtfunc.pyx":292
  *         pCur.stopped = False
  * 
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -2808,7 +2855,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_r = SQLITE_OK;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":267
+  /* "vtfunc.pyx":268
  * 
  * 
  * cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:             # <<<<<<<<<<<<<<
@@ -2836,7 +2883,7 @@ static int __pyx_f_6vtfunc_pwNext(sqlite3_vtab_cursor *__pyx_v_pBase) {
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":293
+/* "vtfunc.pyx":295
  * 
  * 
  * cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,             # <<<<<<<<<<<<<<
@@ -2865,7 +2912,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   #endif
   __Pyx_RefNannySetupContext("pwColumn", 0);
 
-  /* "vtfunc.pyx":297
+  /* "vtfunc.pyx":299
  *     cdef:
  *         bytes bval
  *         peewee_cursor *pCur = <peewee_cursor *>pBase             # <<<<<<<<<<<<<<
@@ -2874,7 +2921,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
   __pyx_v_pCur = ((__pyx_t_6vtfunc_peewee_cursor *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":298
+  /* "vtfunc.pyx":300
  *         bytes bval
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *         sqlite3_int64 x = 0             # <<<<<<<<<<<<<<
@@ -2883,7 +2930,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
   __pyx_v_x = 0;
 
-  /* "vtfunc.pyx":301
+  /* "vtfunc.pyx":303
  *         tuple row_data
  * 
  *     if iCol == -1:             # <<<<<<<<<<<<<<
@@ -2893,7 +2940,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_t_1 = ((__pyx_v_iCol == -1L) != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":302
+    /* "vtfunc.pyx":304
  * 
  *     if iCol == -1:
  *         sqlite3_result_int64(ctx, <sqlite3_int64>pCur.idx)             # <<<<<<<<<<<<<<
@@ -2902,7 +2949,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
     sqlite3_result_int64(__pyx_v_ctx, ((sqlite3_int64)__pyx_v_pCur->idx));
 
-    /* "vtfunc.pyx":303
+    /* "vtfunc.pyx":305
  *     if iCol == -1:
  *         sqlite3_result_int64(ctx, <sqlite3_int64>pCur.idx)
  *         return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -2912,7 +2959,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     __pyx_r = SQLITE_OK;
     goto __pyx_L0;
 
-    /* "vtfunc.pyx":301
+    /* "vtfunc.pyx":303
  *         tuple row_data
  * 
  *     if iCol == -1:             # <<<<<<<<<<<<<<
@@ -2921,7 +2968,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
   }
 
-  /* "vtfunc.pyx":305
+  /* "vtfunc.pyx":307
  *         return SQLITE_OK
  * 
  *     if not pCur.row_data:             # <<<<<<<<<<<<<<
@@ -2931,7 +2978,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_t_1 = ((!(__pyx_v_pCur->row_data != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":306
+    /* "vtfunc.pyx":308
  * 
  *     if not pCur.row_data:
  *         sqlite_error(ctx, 'error: row data not available.')             # <<<<<<<<<<<<<<
@@ -2940,7 +2987,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
     __pyx_f_6vtfunc_sqlite_error(__pyx_v_ctx, __pyx_kp_s_error_row_data_not_available);
 
-    /* "vtfunc.pyx":307
+    /* "vtfunc.pyx":309
  *     if not pCur.row_data:
  *         sqlite_error(ctx, 'error: row data not available.')
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
@@ -2950,7 +2997,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     __pyx_r = SQLITE_ERROR;
     goto __pyx_L0;
 
-    /* "vtfunc.pyx":305
+    /* "vtfunc.pyx":307
  *         return SQLITE_OK
  * 
  *     if not pCur.row_data:             # <<<<<<<<<<<<<<
@@ -2959,7 +3006,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
   }
 
-  /* "vtfunc.pyx":309
+  /* "vtfunc.pyx":311
  *         return SQLITE_ERROR
  * 
  *     row_data = <tuple>pCur.row_data             # <<<<<<<<<<<<<<
@@ -2971,7 +3018,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_v_row_data = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":310
+  /* "vtfunc.pyx":312
  * 
  *     row_data = <tuple>pCur.row_data
  *     value = row_data[iCol]             # <<<<<<<<<<<<<<
@@ -2980,14 +3027,14 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
   if (unlikely(__pyx_v_row_data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 310, __pyx_L1_error)
+    __PYX_ERR(0, 312, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_GetItemInt_Tuple(__pyx_v_row_data, __pyx_v_iCol, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt_Tuple(__pyx_v_row_data, __pyx_v_iCol, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 312, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_value = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":311
+  /* "vtfunc.pyx":313
  *     row_data = <tuple>pCur.row_data
  *     value = row_data[iCol]
  *     if value is None:             # <<<<<<<<<<<<<<
@@ -2998,7 +3045,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_t_3 = (__pyx_t_1 != 0);
   if (__pyx_t_3) {
 
-    /* "vtfunc.pyx":312
+    /* "vtfunc.pyx":314
  *     value = row_data[iCol]
  *     if value is None:
  *         sqlite3_result_null(ctx)             # <<<<<<<<<<<<<<
@@ -3007,7 +3054,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
     sqlite3_result_null(__pyx_v_ctx);
 
-    /* "vtfunc.pyx":311
+    /* "vtfunc.pyx":313
  *     row_data = <tuple>pCur.row_data
  *     value = row_data[iCol]
  *     if value is None:             # <<<<<<<<<<<<<<
@@ -3017,7 +3064,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     goto __pyx_L5;
   }
 
-  /* "vtfunc.pyx":313
+  /* "vtfunc.pyx":315
  *     if value is None:
  *         sqlite3_result_null(ctx)
  *     elif isinstance(value, (int, long)):             # <<<<<<<<<<<<<<
@@ -3038,17 +3085,17 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_t_1 = (__pyx_t_3 != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":314
+    /* "vtfunc.pyx":316
  *         sqlite3_result_null(ctx)
  *     elif isinstance(value, (int, long)):
  *         sqlite3_result_int64(ctx, <sqlite3_int64>value)             # <<<<<<<<<<<<<<
  *     elif isinstance(value, float):
  *         sqlite3_result_double(ctx, <double>value)
  */
-    __pyx_t_5 = __Pyx_PyInt_As_sqlite3_int64(__pyx_v_value); if (unlikely((__pyx_t_5 == ((sqlite3_int64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 314, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_As_sqlite3_int64(__pyx_v_value); if (unlikely((__pyx_t_5 == ((sqlite3_int64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 316, __pyx_L1_error)
     sqlite3_result_int64(__pyx_v_ctx, ((sqlite3_int64)__pyx_t_5));
 
-    /* "vtfunc.pyx":313
+    /* "vtfunc.pyx":315
  *     if value is None:
  *         sqlite3_result_null(ctx)
  *     elif isinstance(value, (int, long)):             # <<<<<<<<<<<<<<
@@ -3058,7 +3105,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     goto __pyx_L5;
   }
 
-  /* "vtfunc.pyx":315
+  /* "vtfunc.pyx":317
  *     elif isinstance(value, (int, long)):
  *         sqlite3_result_int64(ctx, <sqlite3_int64>value)
  *     elif isinstance(value, float):             # <<<<<<<<<<<<<<
@@ -3069,17 +3116,17 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_t_3 = (__pyx_t_1 != 0);
   if (__pyx_t_3) {
 
-    /* "vtfunc.pyx":316
+    /* "vtfunc.pyx":318
  *         sqlite3_result_int64(ctx, <sqlite3_int64>value)
  *     elif isinstance(value, float):
  *         sqlite3_result_double(ctx, <double>value)             # <<<<<<<<<<<<<<
  *     elif isinstance(value, basestring):
  *         bval = encode(value)
  */
-    __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 316, __pyx_L1_error)
+    __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 318, __pyx_L1_error)
     sqlite3_result_double(__pyx_v_ctx, ((double)__pyx_t_6));
 
-    /* "vtfunc.pyx":315
+    /* "vtfunc.pyx":317
  *     elif isinstance(value, (int, long)):
  *         sqlite3_result_int64(ctx, <sqlite3_int64>value)
  *     elif isinstance(value, float):             # <<<<<<<<<<<<<<
@@ -3089,7 +3136,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     goto __pyx_L5;
   }
 
-  /* "vtfunc.pyx":317
+  /* "vtfunc.pyx":319
  *     elif isinstance(value, float):
  *         sqlite3_result_double(ctx, <double>value)
  *     elif isinstance(value, basestring):             # <<<<<<<<<<<<<<
@@ -3100,19 +3147,19 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_t_1 = (__pyx_t_3 != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":318
+    /* "vtfunc.pyx":320
  *         sqlite3_result_double(ctx, <double>value)
  *     elif isinstance(value, basestring):
  *         bval = encode(value)             # <<<<<<<<<<<<<<
  *         sqlite3_result_text(
  *             ctx,
  */
-    __pyx_t_2 = __pyx_f_6vtfunc_encode(__pyx_v_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __pyx_t_2 = __pyx_f_6vtfunc_encode(__pyx_v_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 320, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_bval = ((PyObject*)__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "vtfunc.pyx":321
+    /* "vtfunc.pyx":323
  *         sqlite3_result_text(
  *             ctx,
  *             <const char *>bval,             # <<<<<<<<<<<<<<
@@ -3121,11 +3168,11 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
     if (unlikely(__pyx_v_bval == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-      __PYX_ERR(0, 321, __pyx_L1_error)
+      __PYX_ERR(0, 323, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyBytes_AsString(__pyx_v_bval); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 321, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyBytes_AsString(__pyx_v_bval); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 323, __pyx_L1_error)
 
-    /* "vtfunc.pyx":319
+    /* "vtfunc.pyx":321
  *     elif isinstance(value, basestring):
  *         bval = encode(value)
  *         sqlite3_result_text(             # <<<<<<<<<<<<<<
@@ -3134,7 +3181,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
     sqlite3_result_text(__pyx_v_ctx, ((char const *)__pyx_t_7), -1, ((sqlite3_destructor_type)-1L));
 
-    /* "vtfunc.pyx":317
+    /* "vtfunc.pyx":319
  *     elif isinstance(value, float):
  *         sqlite3_result_double(ctx, <double>value)
  *     elif isinstance(value, basestring):             # <<<<<<<<<<<<<<
@@ -3144,7 +3191,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     goto __pyx_L5;
   }
 
-  /* "vtfunc.pyx":324
+  /* "vtfunc.pyx":326
  *             -1,
  *             <sqlite3_destructor_type>-1)
  *     elif isinstance(value, bool):             # <<<<<<<<<<<<<<
@@ -3153,25 +3200,25 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  */
   __pyx_t_2 = ((PyObject*)&PyBool_Type);
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_1 = PyObject_IsInstance(__pyx_v_value, __pyx_t_2); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 324, __pyx_L1_error)
+  __pyx_t_1 = PyObject_IsInstance(__pyx_v_value, __pyx_t_2); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_3 = (__pyx_t_1 != 0);
   if (__pyx_t_3) {
 
-    /* "vtfunc.pyx":325
+    /* "vtfunc.pyx":327
  *             <sqlite3_destructor_type>-1)
  *     elif isinstance(value, bool):
  *         sqlite3_result_int(ctx, int(value))             # <<<<<<<<<<<<<<
  *     else:
  *         sqlite_error(ctx, 'Unsupported type %s' % type(value))
  */
-    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_v_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_v_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 325, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     sqlite3_result_int(__pyx_v_ctx, __pyx_t_8);
 
-    /* "vtfunc.pyx":324
+    /* "vtfunc.pyx":326
  *             -1,
  *             <sqlite3_destructor_type>-1)
  *     elif isinstance(value, bool):             # <<<<<<<<<<<<<<
@@ -3181,7 +3228,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
     goto __pyx_L5;
   }
 
-  /* "vtfunc.pyx":327
+  /* "vtfunc.pyx":329
  *         sqlite3_result_int(ctx, int(value))
  *     else:
  *         sqlite_error(ctx, 'Unsupported type %s' % type(value))             # <<<<<<<<<<<<<<
@@ -3189,12 +3236,12 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
  * 
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Unsupported_type_s, ((PyObject *)Py_TYPE(__pyx_v_value))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_Unsupported_type_s, ((PyObject *)Py_TYPE(__pyx_v_value))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_f_6vtfunc_sqlite_error(__pyx_v_ctx, __pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "vtfunc.pyx":328
+    /* "vtfunc.pyx":330
  *     else:
  *         sqlite_error(ctx, 'Unsupported type %s' % type(value))
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
@@ -3206,7 +3253,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   }
   __pyx_L5:;
 
-  /* "vtfunc.pyx":330
+  /* "vtfunc.pyx":332
  *         return SQLITE_ERROR
  * 
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -3216,7 +3263,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   __pyx_r = SQLITE_OK;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":293
+  /* "vtfunc.pyx":295
  * 
  * 
  * cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,             # <<<<<<<<<<<<<<
@@ -3240,7 +3287,7 @@ static int __pyx_f_6vtfunc_pwColumn(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":333
+/* "vtfunc.pyx":335
  * 
  * 
  * cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):             # <<<<<<<<<<<<<<
@@ -3254,7 +3301,7 @@ static int __pyx_f_6vtfunc_pwRowid(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_i
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("pwRowid", 0);
 
-  /* "vtfunc.pyx":335
+  /* "vtfunc.pyx":337
  * cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase             # <<<<<<<<<<<<<<
@@ -3263,7 +3310,7 @@ static int __pyx_f_6vtfunc_pwRowid(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_i
  */
   __pyx_v_pCur = ((__pyx_t_6vtfunc_peewee_cursor *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":336
+  /* "vtfunc.pyx":338
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *     pRowid[0] = <sqlite3_int64>pCur.idx             # <<<<<<<<<<<<<<
@@ -3272,7 +3319,7 @@ static int __pyx_f_6vtfunc_pwRowid(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_i
  */
   (__pyx_v_pRowid[0]) = ((sqlite3_int64)__pyx_v_pCur->idx);
 
-  /* "vtfunc.pyx":337
+  /* "vtfunc.pyx":339
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *     pRowid[0] = <sqlite3_int64>pCur.idx
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -3282,7 +3329,7 @@ static int __pyx_f_6vtfunc_pwRowid(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_i
   __pyx_r = SQLITE_OK;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":333
+  /* "vtfunc.pyx":335
  * 
  * 
  * cdef int pwRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):             # <<<<<<<<<<<<<<
@@ -3296,7 +3343,7 @@ static int __pyx_f_6vtfunc_pwRowid(sqlite3_vtab_cursor *__pyx_v_pBase, sqlite3_i
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":340
+/* "vtfunc.pyx":342
  * 
  * 
  * cdef int pwEof(sqlite3_vtab_cursor *pBase):             # <<<<<<<<<<<<<<
@@ -3311,7 +3358,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("pwEof", 0);
 
-  /* "vtfunc.pyx":342
+  /* "vtfunc.pyx":344
  * cdef int pwEof(sqlite3_vtab_cursor *pBase):
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase             # <<<<<<<<<<<<<<
@@ -3320,7 +3367,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   __pyx_v_pCur = ((__pyx_t_6vtfunc_peewee_cursor *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":343
+  /* "vtfunc.pyx":345
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *     if pCur.stopped:             # <<<<<<<<<<<<<<
@@ -3330,7 +3377,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_t_1 = (__pyx_v_pCur->stopped != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":344
+    /* "vtfunc.pyx":346
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *     if pCur.stopped:
  *         return 1             # <<<<<<<<<<<<<<
@@ -3340,7 +3387,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
     __pyx_r = 1;
     goto __pyx_L0;
 
-    /* "vtfunc.pyx":343
+    /* "vtfunc.pyx":345
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *     if pCur.stopped:             # <<<<<<<<<<<<<<
@@ -3349,7 +3396,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
  */
   }
 
-  /* "vtfunc.pyx":345
+  /* "vtfunc.pyx":347
  *     if pCur.stopped:
  *         return 1
  *     return 0             # <<<<<<<<<<<<<<
@@ -3359,7 +3406,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":340
+  /* "vtfunc.pyx":342
  * 
  * 
  * cdef int pwEof(sqlite3_vtab_cursor *pBase):             # <<<<<<<<<<<<<<
@@ -3373,7 +3420,7 @@ static int __pyx_f_6vtfunc_pwEof(sqlite3_vtab_cursor *__pyx_v_pBase) {
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":348
+/* "vtfunc.pyx":350
  * 
  * 
  * cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,             # <<<<<<<<<<<<<<
@@ -3414,7 +3461,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
   #endif
   __Pyx_RefNannySetupContext("pwFilter", 0);
 
-  /* "vtfunc.pyx":351
+  /* "vtfunc.pyx":353
  *                   const char *idxStr, int argc, sqlite3_value **argv) with gil:
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase             # <<<<<<<<<<<<<<
@@ -3423,7 +3470,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
   __pyx_v_pCur = ((__pyx_t_6vtfunc_peewee_cursor *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":352
+  /* "vtfunc.pyx":354
  *     cdef:
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *         object table_func = <object>pCur.table_func             # <<<<<<<<<<<<<<
@@ -3435,19 +3482,19 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
   __pyx_v_table_func = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":353
+  /* "vtfunc.pyx":355
  *         peewee_cursor *pCur = <peewee_cursor *>pBase
  *         object table_func = <object>pCur.table_func
  *         dict query = {}             # <<<<<<<<<<<<<<
  *         int idx
  *         int value_type
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_query = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":359
+  /* "vtfunc.pyx":361
  *         void *row_data_raw
  * 
  *     if not idxStr or argc == 0 and len(table_func.params):             # <<<<<<<<<<<<<<
@@ -3466,16 +3513,16 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = __pyx_t_3;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_4 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_4 != 0);
   __pyx_t_2 = __pyx_t_3;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "vtfunc.pyx":360
+    /* "vtfunc.pyx":362
  * 
  *     if not idxStr or argc == 0 and len(table_func.params):
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
@@ -3485,7 +3532,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_r = SQLITE_ERROR;
     goto __pyx_L0;
 
-    /* "vtfunc.pyx":359
+    /* "vtfunc.pyx":361
  *         void *row_data_raw
  * 
  *     if not idxStr or argc == 0 and len(table_func.params):             # <<<<<<<<<<<<<<
@@ -3494,7 +3541,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
   }
 
-  /* "vtfunc.pyx":361
+  /* "vtfunc.pyx":363
  *     if not idxStr or argc == 0 and len(table_func.params):
  *         return SQLITE_ERROR
  *     elif idxStr:             # <<<<<<<<<<<<<<
@@ -3504,29 +3551,29 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
   __pyx_t_2 = (__pyx_v_idxStr != 0);
   if (__pyx_t_2) {
 
-    /* "vtfunc.pyx":362
+    /* "vtfunc.pyx":364
  *         return SQLITE_ERROR
  *     elif idxStr:
  *         params = decode(idxStr).split(',')             # <<<<<<<<<<<<<<
  *     else:
  *         params = []
  */
-    __pyx_t_1 = __Pyx_PyBytes_FromString(__pyx_v_idxStr); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyBytes_FromString(__pyx_v_idxStr); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __pyx_f_6vtfunc_decode(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_5 = __pyx_f_6vtfunc_decode(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 364, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(__pyx_t_5 == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "split");
-      __PYX_ERR(0, 362, __pyx_L1_error)
+      __PYX_ERR(0, 364, __pyx_L1_error)
     }
-    __pyx_t_1 = PyUnicode_Split(((PyObject*)__pyx_t_5), __pyx_kp_s__3, -1L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_1 = PyUnicode_Split(((PyObject*)__pyx_t_5), __pyx_kp_s__3, -1L); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_params = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "vtfunc.pyx":361
+    /* "vtfunc.pyx":363
  *     if not idxStr or argc == 0 and len(table_func.params):
  *         return SQLITE_ERROR
  *     elif idxStr:             # <<<<<<<<<<<<<<
@@ -3536,7 +3583,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     goto __pyx_L3;
   }
 
-  /* "vtfunc.pyx":364
+  /* "vtfunc.pyx":366
  *         params = decode(idxStr).split(',')
  *     else:
  *         params = []             # <<<<<<<<<<<<<<
@@ -3544,14 +3591,14 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  *     for idx, param in enumerate(params):
  */
   /*else*/ {
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_v_params = __pyx_t_1;
     __pyx_t_1 = 0;
   }
   __pyx_L3:;
 
-  /* "vtfunc.pyx":366
+  /* "vtfunc.pyx":368
  *         params = []
  * 
  *     for idx, param in enumerate(params):             # <<<<<<<<<<<<<<
@@ -3563,26 +3610,26 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_1 = __pyx_v_params; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 366, __pyx_L1_error)
+    __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 368, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_7)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 366, __pyx_L1_error)
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 368, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 366, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 368, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 366, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 368, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 366, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 368, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -3592,7 +3639,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 366, __pyx_L1_error)
+          else __PYX_ERR(0, 368, __pyx_L1_error)
         }
         break;
       }
@@ -3603,7 +3650,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_v_idx = __pyx_t_6;
     __pyx_t_6 = (__pyx_t_6 + 1);
 
-    /* "vtfunc.pyx":367
+    /* "vtfunc.pyx":369
  * 
  *     for idx, param in enumerate(params):
  *         value = argv[idx]             # <<<<<<<<<<<<<<
@@ -3612,7 +3659,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
     __pyx_v_value = (__pyx_v_argv[__pyx_v_idx]);
 
-    /* "vtfunc.pyx":368
+    /* "vtfunc.pyx":370
  *     for idx, param in enumerate(params):
  *         value = argv[idx]
  *         if not value:             # <<<<<<<<<<<<<<
@@ -3622,16 +3669,16 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = ((!(__pyx_v_value != 0)) != 0);
     if (__pyx_t_2) {
 
-      /* "vtfunc.pyx":369
+      /* "vtfunc.pyx":371
  *         value = argv[idx]
  *         if not value:
  *             query[param] = None             # <<<<<<<<<<<<<<
  *             continue
  * 
  */
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, Py_None) < 0)) __PYX_ERR(0, 369, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, Py_None) < 0)) __PYX_ERR(0, 371, __pyx_L1_error)
 
-      /* "vtfunc.pyx":370
+      /* "vtfunc.pyx":372
  *         if not value:
  *             query[param] = None
  *             continue             # <<<<<<<<<<<<<<
@@ -3640,7 +3687,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
       goto __pyx_L7_continue;
 
-      /* "vtfunc.pyx":368
+      /* "vtfunc.pyx":370
  *     for idx, param in enumerate(params):
  *         value = argv[idx]
  *         if not value:             # <<<<<<<<<<<<<<
@@ -3649,7 +3696,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
     }
 
-    /* "vtfunc.pyx":372
+    /* "vtfunc.pyx":374
  *             continue
  * 
  *         value_type = sqlite3_value_type(value)             # <<<<<<<<<<<<<<
@@ -3658,7 +3705,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
     __pyx_v_value_type = sqlite3_value_type(__pyx_v_value);
 
-    /* "vtfunc.pyx":373
+    /* "vtfunc.pyx":375
  * 
  *         value_type = sqlite3_value_type(value)
  *         if value_type == SQLITE_INTEGER:             # <<<<<<<<<<<<<<
@@ -3668,19 +3715,19 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = ((__pyx_v_value_type == SQLITE_INTEGER) != 0);
     if (__pyx_t_2) {
 
-      /* "vtfunc.pyx":374
+      /* "vtfunc.pyx":376
  *         value_type = sqlite3_value_type(value)
  *         if value_type == SQLITE_INTEGER:
  *             query[param] = sqlite3_value_int(value)             # <<<<<<<<<<<<<<
  *         elif value_type == SQLITE_FLOAT:
  *             query[param] = sqlite3_value_double(value)
  */
-      __pyx_t_5 = __Pyx_PyInt_From_int(sqlite3_value_int(__pyx_v_value)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 374, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_int(sqlite3_value_int(__pyx_v_value)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_5) < 0)) __PYX_ERR(0, 374, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_5) < 0)) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "vtfunc.pyx":373
+      /* "vtfunc.pyx":375
  * 
  *         value_type = sqlite3_value_type(value)
  *         if value_type == SQLITE_INTEGER:             # <<<<<<<<<<<<<<
@@ -3690,7 +3737,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       goto __pyx_L10;
     }
 
-    /* "vtfunc.pyx":375
+    /* "vtfunc.pyx":377
  *         if value_type == SQLITE_INTEGER:
  *             query[param] = sqlite3_value_int(value)
  *         elif value_type == SQLITE_FLOAT:             # <<<<<<<<<<<<<<
@@ -3700,19 +3747,19 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = ((__pyx_v_value_type == SQLITE_FLOAT) != 0);
     if (__pyx_t_2) {
 
-      /* "vtfunc.pyx":376
+      /* "vtfunc.pyx":378
  *             query[param] = sqlite3_value_int(value)
  *         elif value_type == SQLITE_FLOAT:
  *             query[param] = sqlite3_value_double(value)             # <<<<<<<<<<<<<<
  *         elif value_type == SQLITE_TEXT:
  *             query[param] = decode(sqlite3_value_text(value))
  */
-      __pyx_t_5 = PyFloat_FromDouble(sqlite3_value_double(__pyx_v_value)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 376, __pyx_L1_error)
+      __pyx_t_5 = PyFloat_FromDouble(sqlite3_value_double(__pyx_v_value)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_5) < 0)) __PYX_ERR(0, 376, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_5) < 0)) __PYX_ERR(0, 378, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "vtfunc.pyx":375
+      /* "vtfunc.pyx":377
  *         if value_type == SQLITE_INTEGER:
  *             query[param] = sqlite3_value_int(value)
  *         elif value_type == SQLITE_FLOAT:             # <<<<<<<<<<<<<<
@@ -3722,7 +3769,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       goto __pyx_L10;
     }
 
-    /* "vtfunc.pyx":377
+    /* "vtfunc.pyx":379
  *         elif value_type == SQLITE_FLOAT:
  *             query[param] = sqlite3_value_double(value)
  *         elif value_type == SQLITE_TEXT:             # <<<<<<<<<<<<<<
@@ -3732,22 +3779,22 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = ((__pyx_v_value_type == SQLITE_TEXT) != 0);
     if (__pyx_t_2) {
 
-      /* "vtfunc.pyx":378
+      /* "vtfunc.pyx":380
  *             query[param] = sqlite3_value_double(value)
  *         elif value_type == SQLITE_TEXT:
  *             query[param] = decode(sqlite3_value_text(value))             # <<<<<<<<<<<<<<
  *         elif value_type == SQLITE_BLOB:
  *             query[param] = <bytes>sqlite3_value_blob(value)
  */
-      __pyx_t_5 = __Pyx_PyBytes_FromCString(sqlite3_value_text(__pyx_v_value)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyBytes_FromCString(sqlite3_value_text(__pyx_v_value)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_8 = __pyx_f_6vtfunc_decode(__pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_8 = __pyx_f_6vtfunc_decode(__pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_8) < 0)) __PYX_ERR(0, 378, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_8) < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "vtfunc.pyx":377
+      /* "vtfunc.pyx":379
  *         elif value_type == SQLITE_FLOAT:
  *             query[param] = sqlite3_value_double(value)
  *         elif value_type == SQLITE_TEXT:             # <<<<<<<<<<<<<<
@@ -3757,7 +3804,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       goto __pyx_L10;
     }
 
-    /* "vtfunc.pyx":379
+    /* "vtfunc.pyx":381
  *         elif value_type == SQLITE_TEXT:
  *             query[param] = decode(sqlite3_value_text(value))
  *         elif value_type == SQLITE_BLOB:             # <<<<<<<<<<<<<<
@@ -3767,7 +3814,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = ((__pyx_v_value_type == SQLITE_BLOB) != 0);
     if (__pyx_t_2) {
 
-      /* "vtfunc.pyx":380
+      /* "vtfunc.pyx":382
  *             query[param] = decode(sqlite3_value_text(value))
  *         elif value_type == SQLITE_BLOB:
  *             query[param] = <bytes>sqlite3_value_blob(value)             # <<<<<<<<<<<<<<
@@ -3777,10 +3824,10 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       __pyx_t_9 = sqlite3_value_blob(__pyx_v_value);
       __pyx_t_8 = ((PyObject *)__pyx_t_9);
       __Pyx_INCREF(__pyx_t_8);
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_8) < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, __pyx_t_8) < 0)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "vtfunc.pyx":379
+      /* "vtfunc.pyx":381
  *         elif value_type == SQLITE_TEXT:
  *             query[param] = decode(sqlite3_value_text(value))
  *         elif value_type == SQLITE_BLOB:             # <<<<<<<<<<<<<<
@@ -3790,7 +3837,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       goto __pyx_L10;
     }
 
-    /* "vtfunc.pyx":381
+    /* "vtfunc.pyx":383
  *         elif value_type == SQLITE_BLOB:
  *             query[param] = <bytes>sqlite3_value_blob(value)
  *         elif value_type == SQLITE_NULL:             # <<<<<<<<<<<<<<
@@ -3800,16 +3847,16 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_2 = ((__pyx_v_value_type == SQLITE_NULL) != 0);
     if (__pyx_t_2) {
 
-      /* "vtfunc.pyx":382
+      /* "vtfunc.pyx":384
  *             query[param] = <bytes>sqlite3_value_blob(value)
  *         elif value_type == SQLITE_NULL:
  *             query[param] = None             # <<<<<<<<<<<<<<
  *         else:
  *             query[param] = None
  */
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, Py_None) < 0)) __PYX_ERR(0, 382, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, Py_None) < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
 
-      /* "vtfunc.pyx":381
+      /* "vtfunc.pyx":383
  *         elif value_type == SQLITE_BLOB:
  *             query[param] = <bytes>sqlite3_value_blob(value)
  *         elif value_type == SQLITE_NULL:             # <<<<<<<<<<<<<<
@@ -3819,7 +3866,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       goto __pyx_L10;
     }
 
-    /* "vtfunc.pyx":384
+    /* "vtfunc.pyx":386
  *             query[param] = None
  *         else:
  *             query[param] = None             # <<<<<<<<<<<<<<
@@ -3827,11 +3874,11 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  *     try:
  */
     /*else*/ {
-      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, Py_None) < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_query, __pyx_v_param, Py_None) < 0)) __PYX_ERR(0, 386, __pyx_L1_error)
     }
     __pyx_L10:;
 
-    /* "vtfunc.pyx":366
+    /* "vtfunc.pyx":368
  *         params = []
  * 
  *     for idx, param in enumerate(params):             # <<<<<<<<<<<<<<
@@ -3842,7 +3889,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":386
+  /* "vtfunc.pyx":388
  *             query[param] = None
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -3858,21 +3905,21 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __Pyx_XGOTREF(__pyx_t_12);
     /*try:*/ {
 
-      /* "vtfunc.pyx":387
+      /* "vtfunc.pyx":389
  * 
  *     try:
  *         table_func.initialize(**query)             # <<<<<<<<<<<<<<
  *     except:
- *         traceback.print_exc()
+ *         if table_func.print_tracebacks:
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_initialize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 387, __pyx_L11_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_initialize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L11_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_v_query); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 387, __pyx_L11_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_v_query); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 389, __pyx_L11_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "vtfunc.pyx":386
+      /* "vtfunc.pyx":388
  *             query[param] = None
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -3889,55 +3936,77 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "vtfunc.pyx":388
+    /* "vtfunc.pyx":390
  *     try:
  *         table_func.initialize(**query)
  *     except:             # <<<<<<<<<<<<<<
- *         traceback.print_exc()
- *         return SQLITE_ERROR
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()
  */
     /*except:*/ {
       __Pyx_AddTraceback("vtfunc.pwFilter", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_1, &__pyx_t_5) < 0) __PYX_ERR(0, 388, __pyx_L13_except_error)
+      if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_1, &__pyx_t_5) < 0) __PYX_ERR(0, 390, __pyx_L13_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_5);
 
-      /* "vtfunc.pyx":389
+      /* "vtfunc.pyx":391
  *         table_func.initialize(**query)
  *     except:
- *         traceback.print_exc()             # <<<<<<<<<<<<<<
+ *         if table_func.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         return SQLITE_ERROR
+ */
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_print_tracebacks); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 391, __pyx_L13_except_error)
+      __Pyx_GOTREF(__pyx_t_13);
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 391, __pyx_L13_except_error)
+      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+      if (__pyx_t_2) {
+
+        /* "vtfunc.pyx":392
+ *     except:
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()             # <<<<<<<<<<<<<<
  *         return SQLITE_ERROR
  * 
  */
-      __pyx_t_14 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 389, __pyx_L13_except_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 389, __pyx_L13_except_error)
-      __Pyx_GOTREF(__pyx_t_15);
-      __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      __pyx_t_14 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_15))) {
-        __pyx_t_14 = PyMethod_GET_SELF(__pyx_t_15);
-        if (likely(__pyx_t_14)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-          __Pyx_INCREF(__pyx_t_14);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_15, function);
-        }
-      }
-      if (__pyx_t_14) {
-        __pyx_t_13 = __Pyx_PyObject_CallOneArg(__pyx_t_15, __pyx_t_14); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 389, __pyx_L13_except_error)
+        __pyx_t_14 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 392, __pyx_L13_except_error)
+        __Pyx_GOTREF(__pyx_t_14);
+        __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 392, __pyx_L13_except_error)
+        __Pyx_GOTREF(__pyx_t_15);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      } else {
-        __pyx_t_13 = __Pyx_PyObject_CallNoArg(__pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 389, __pyx_L13_except_error)
-      }
-      __Pyx_GOTREF(__pyx_t_13);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __pyx_t_14 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_15))) {
+          __pyx_t_14 = PyMethod_GET_SELF(__pyx_t_15);
+          if (likely(__pyx_t_14)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
+            __Pyx_INCREF(__pyx_t_14);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_15, function);
+          }
+        }
+        if (__pyx_t_14) {
+          __pyx_t_13 = __Pyx_PyObject_CallOneArg(__pyx_t_15, __pyx_t_14); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 392, __pyx_L13_except_error)
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+        } else {
+          __pyx_t_13 = __Pyx_PyObject_CallNoArg(__pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 392, __pyx_L13_except_error)
+        }
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "vtfunc.pyx":390
+        /* "vtfunc.pyx":391
+ *         table_func.initialize(**query)
  *     except:
- *         traceback.print_exc()
+ *         if table_func.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         return SQLITE_ERROR
+ */
+      }
+
+      /* "vtfunc.pyx":393
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
  * 
  *     pCur.stopped = False
@@ -3950,7 +4019,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     }
     __pyx_L13_except_error:;
 
-    /* "vtfunc.pyx":386
+    /* "vtfunc.pyx":388
  *             query[param] = None
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -3971,7 +4040,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_L16_try_end:;
   }
 
-  /* "vtfunc.pyx":392
+  /* "vtfunc.pyx":395
  *         return SQLITE_ERROR
  * 
  *     pCur.stopped = False             # <<<<<<<<<<<<<<
@@ -3980,7 +4049,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
   __pyx_v_pCur->stopped = 0;
 
-  /* "vtfunc.pyx":393
+  /* "vtfunc.pyx":396
  * 
  *     pCur.stopped = False
  *     try:             # <<<<<<<<<<<<<<
@@ -3996,25 +4065,25 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __Pyx_XGOTREF(__pyx_t_10);
     /*try:*/ {
 
-      /* "vtfunc.pyx":394
+      /* "vtfunc.pyx":397
  *     pCur.stopped = False
  *     try:
  *         row_data = tuple(table_func.iterate(0))             # <<<<<<<<<<<<<<
  *     except StopIteration:
  *         pCur.stopped = True
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_iterate); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L19_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_iterate); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 397, __pyx_L20_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L19_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 397, __pyx_L20_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 394, __pyx_L19_error)
+      __pyx_t_5 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 397, __pyx_L20_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_row_data = ((PyObject*)__pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "vtfunc.pyx":393
+      /* "vtfunc.pyx":396
  * 
  *     pCur.stopped = False
  *     try:             # <<<<<<<<<<<<<<
@@ -4023,7 +4092,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
     }
 
-    /* "vtfunc.pyx":401
+    /* "vtfunc.pyx":405
  *         return SQLITE_ERROR
  *     else:
  *         Py_INCREF(row_data)             # <<<<<<<<<<<<<<
@@ -4033,7 +4102,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     /*else:*/ {
       Py_INCREF(__pyx_v_row_data);
 
-      /* "vtfunc.pyx":402
+      /* "vtfunc.pyx":406
  *     else:
  *         Py_INCREF(row_data)
  *         pCur.row_data = <void *>row_data             # <<<<<<<<<<<<<<
@@ -4042,7 +4111,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
  */
       __pyx_v_pCur->row_data = ((void *)__pyx_v_row_data);
 
-      /* "vtfunc.pyx":403
+      /* "vtfunc.pyx":407
  *         Py_INCREF(row_data)
  *         pCur.row_data = <void *>row_data
  *         pCur.idx += 1             # <<<<<<<<<<<<<<
@@ -4054,8 +4123,8 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    goto __pyx_L24_try_end;
-    __pyx_L19_error:;
+    goto __pyx_L25_try_end;
+    __pyx_L20_error:;
     __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
     __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
     __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -4063,7 +4132,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "vtfunc.pyx":395
+    /* "vtfunc.pyx":398
  *     try:
  *         row_data = tuple(table_func.iterate(0))
  *     except StopIteration:             # <<<<<<<<<<<<<<
@@ -4073,77 +4142,99 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_StopIteration);
     if (__pyx_t_6) {
       __Pyx_AddTraceback("vtfunc.pwFilter", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_1, &__pyx_t_8) < 0) __PYX_ERR(0, 395, __pyx_L21_except_error)
+      if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_1, &__pyx_t_8) < 0) __PYX_ERR(0, 398, __pyx_L22_except_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_8);
 
-      /* "vtfunc.pyx":396
+      /* "vtfunc.pyx":399
  *         row_data = tuple(table_func.iterate(0))
  *     except StopIteration:
  *         pCur.stopped = True             # <<<<<<<<<<<<<<
  *     except Exception as exc:
- *         traceback.print_exc()
+ *         if table_func.print_tracebacks:
  */
       __pyx_v_pCur->stopped = 1;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      goto __pyx_L20_exception_handled;
+      goto __pyx_L21_exception_handled;
     }
 
-    /* "vtfunc.pyx":397
+    /* "vtfunc.pyx":400
  *     except StopIteration:
  *         pCur.stopped = True
  *     except Exception as exc:             # <<<<<<<<<<<<<<
- *         traceback.print_exc()
- *         return SQLITE_ERROR
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()
  */
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
     if (__pyx_t_6) {
       __Pyx_AddTraceback("vtfunc.pwFilter", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_1, &__pyx_t_5) < 0) __PYX_ERR(0, 397, __pyx_L21_except_error)
+      if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_1, &__pyx_t_5) < 0) __PYX_ERR(0, 400, __pyx_L22_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_v_exc = __pyx_t_1;
 
-      /* "vtfunc.pyx":398
+      /* "vtfunc.pyx":401
  *         pCur.stopped = True
  *     except Exception as exc:
- *         traceback.print_exc()             # <<<<<<<<<<<<<<
+ *         if table_func.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         return SQLITE_ERROR
+ */
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func, __pyx_n_s_print_tracebacks); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 401, __pyx_L22_except_error)
+      __Pyx_GOTREF(__pyx_t_13);
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 401, __pyx_L22_except_error)
+      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+      if (__pyx_t_2) {
+
+        /* "vtfunc.pyx":402
+ *     except Exception as exc:
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()             # <<<<<<<<<<<<<<
  *         return SQLITE_ERROR
  *     else:
  */
-      __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 398, __pyx_L21_except_error)
-      __Pyx_GOTREF(__pyx_t_15);
-      __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 398, __pyx_L21_except_error)
-      __Pyx_GOTREF(__pyx_t_14);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_15 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_14))) {
-        __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_14);
-        if (likely(__pyx_t_15)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
-          __Pyx_INCREF(__pyx_t_15);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_14, function);
-        }
-      }
-      if (__pyx_t_15) {
-        __pyx_t_13 = __Pyx_PyObject_CallOneArg(__pyx_t_14, __pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 398, __pyx_L21_except_error)
+        __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_traceback); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 402, __pyx_L22_except_error)
+        __Pyx_GOTREF(__pyx_t_15);
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_print_exc); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 402, __pyx_L22_except_error)
+        __Pyx_GOTREF(__pyx_t_14);
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      } else {
-        __pyx_t_13 = __Pyx_PyObject_CallNoArg(__pyx_t_14); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 398, __pyx_L21_except_error)
-      }
-      __Pyx_GOTREF(__pyx_t_13);
-      __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __pyx_t_15 = NULL;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_14))) {
+          __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_14);
+          if (likely(__pyx_t_15)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
+            __Pyx_INCREF(__pyx_t_15);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_14, function);
+          }
+        }
+        if (__pyx_t_15) {
+          __pyx_t_13 = __Pyx_PyObject_CallOneArg(__pyx_t_14, __pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 402, __pyx_L22_except_error)
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+        } else {
+          __pyx_t_13 = __Pyx_PyObject_CallNoArg(__pyx_t_14); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 402, __pyx_L22_except_error)
+        }
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "vtfunc.pyx":399
+        /* "vtfunc.pyx":401
+ *         pCur.stopped = True
  *     except Exception as exc:
- *         traceback.print_exc()
+ *         if table_func.print_tracebacks:             # <<<<<<<<<<<<<<
+ *             traceback.print_exc()
+ *         return SQLITE_ERROR
+ */
+      }
+
+      /* "vtfunc.pyx":403
+ *         if table_func.print_tracebacks:
+ *             traceback.print_exc()
  *         return SQLITE_ERROR             # <<<<<<<<<<<<<<
  *     else:
  *         Py_INCREF(row_data)
@@ -4152,12 +4243,12 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      goto __pyx_L22_except_return;
+      goto __pyx_L23_except_return;
     }
-    goto __pyx_L21_except_error;
-    __pyx_L21_except_error:;
+    goto __pyx_L22_except_error;
+    __pyx_L22_except_error:;
 
-    /* "vtfunc.pyx":393
+    /* "vtfunc.pyx":396
  * 
  *     pCur.stopped = False
  *     try:             # <<<<<<<<<<<<<<
@@ -4169,21 +4260,21 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
     __Pyx_XGIVEREF(__pyx_t_10);
     __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_11, __pyx_t_10);
     goto __pyx_L1_error;
-    __pyx_L22_except_return:;
+    __pyx_L23_except_return:;
     __Pyx_XGIVEREF(__pyx_t_12);
     __Pyx_XGIVEREF(__pyx_t_11);
     __Pyx_XGIVEREF(__pyx_t_10);
     __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_11, __pyx_t_10);
     goto __pyx_L0;
-    __pyx_L20_exception_handled:;
+    __pyx_L21_exception_handled:;
     __Pyx_XGIVEREF(__pyx_t_12);
     __Pyx_XGIVEREF(__pyx_t_11);
     __Pyx_XGIVEREF(__pyx_t_10);
     __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_11, __pyx_t_10);
-    __pyx_L24_try_end:;
+    __pyx_L25_try_end:;
   }
 
-  /* "vtfunc.pyx":404
+  /* "vtfunc.pyx":408
  *         pCur.row_data = <void *>row_data
  *         pCur.idx += 1
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -4193,7 +4284,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
   __pyx_r = SQLITE_OK;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":348
+  /* "vtfunc.pyx":350
  * 
  * 
  * cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,             # <<<<<<<<<<<<<<
@@ -4225,7 +4316,7 @@ static int __pyx_f_6vtfunc_pwFilter(sqlite3_vtab_cursor *__pyx_v_pBase, CYTHON_U
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":407
+/* "vtfunc.pyx":411
  * 
  * 
  * cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \             # <<<<<<<<<<<<<<
@@ -4261,7 +4352,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   #endif
   __Pyx_RefNannySetupContext("pwBestIndex", 0);
 
-  /* "vtfunc.pyx":411
+  /* "vtfunc.pyx":415
  *     cdef:
  *         int i
  *         int idxNum = 0, nArg = 0             # <<<<<<<<<<<<<<
@@ -4271,7 +4362,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   __pyx_v_idxNum = 0;
   __pyx_v_nArg = 0;
 
-  /* "vtfunc.pyx":412
+  /* "vtfunc.pyx":416
  *         int i
  *         int idxNum = 0, nArg = 0
  *         peewee_vtab *pVtab = <peewee_vtab *>pBase             # <<<<<<<<<<<<<<
@@ -4280,7 +4371,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
   __pyx_v_pVtab = ((__pyx_t_6vtfunc_peewee_vtab *)__pyx_v_pBase);
 
-  /* "vtfunc.pyx":413
+  /* "vtfunc.pyx":417
  *         int idxNum = 0, nArg = 0
  *         peewee_vtab *pVtab = <peewee_vtab *>pBase
  *         object table_func_cls = <object>pVtab.table_func_cls             # <<<<<<<<<<<<<<
@@ -4292,32 +4383,32 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   __pyx_v_table_func_cls = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":415
+  /* "vtfunc.pyx":419
  *         object table_func_cls = <object>pVtab.table_func_cls
  *         sqlite3_index_constraint *pConstraint
  *         list columns = []             # <<<<<<<<<<<<<<
  *         char *idxStr
  *         int nParams = len(table_func_cls.params)
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 415, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 419, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_columns = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":417
+  /* "vtfunc.pyx":421
  *         list columns = []
  *         char *idxStr
  *         int nParams = len(table_func_cls.params)             # <<<<<<<<<<<<<<
  * 
  *     pConstraint = <sqlite3_index_constraint*>0
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 417, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 417, __pyx_L1_error)
+  __pyx_t_2 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 421, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_nParams = __pyx_t_2;
 
-  /* "vtfunc.pyx":419
+  /* "vtfunc.pyx":423
  *         int nParams = len(table_func_cls.params)
  * 
  *     pConstraint = <sqlite3_index_constraint*>0             # <<<<<<<<<<<<<<
@@ -4326,7 +4417,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
   __pyx_v_pConstraint = ((struct __pyx_t_6vtfunc_sqlite3_index_constraint *)0);
 
-  /* "vtfunc.pyx":420
+  /* "vtfunc.pyx":424
  * 
  *     pConstraint = <sqlite3_index_constraint*>0
  *     for i in range(pIdxInfo.nConstraint):             # <<<<<<<<<<<<<<
@@ -4337,7 +4428,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "vtfunc.pyx":421
+    /* "vtfunc.pyx":425
  *     pConstraint = <sqlite3_index_constraint*>0
  *     for i in range(pIdxInfo.nConstraint):
  *         pConstraint = &pIdxInfo.aConstraint[i]             # <<<<<<<<<<<<<<
@@ -4346,7 +4437,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     __pyx_v_pConstraint = (&(__pyx_v_pIdxInfo->aConstraint[__pyx_v_i]));
 
-    /* "vtfunc.pyx":422
+    /* "vtfunc.pyx":426
  *     for i in range(pIdxInfo.nConstraint):
  *         pConstraint = &pIdxInfo.aConstraint[i]
  *         if not pConstraint.usable:             # <<<<<<<<<<<<<<
@@ -4356,7 +4447,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     __pyx_t_5 = ((!(__pyx_v_pConstraint->usable != 0)) != 0);
     if (__pyx_t_5) {
 
-      /* "vtfunc.pyx":423
+      /* "vtfunc.pyx":427
  *         pConstraint = &pIdxInfo.aConstraint[i]
  *         if not pConstraint.usable:
  *             continue             # <<<<<<<<<<<<<<
@@ -4365,7 +4456,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
       goto __pyx_L3_continue;
 
-      /* "vtfunc.pyx":422
+      /* "vtfunc.pyx":426
  *     for i in range(pIdxInfo.nConstraint):
  *         pConstraint = &pIdxInfo.aConstraint[i]
  *         if not pConstraint.usable:             # <<<<<<<<<<<<<<
@@ -4374,7 +4465,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     }
 
-    /* "vtfunc.pyx":424
+    /* "vtfunc.pyx":428
  *         if not pConstraint.usable:
  *             continue
  *         if pConstraint.op != SQLITE_INDEX_CONSTRAINT_EQ:             # <<<<<<<<<<<<<<
@@ -4384,7 +4475,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     __pyx_t_5 = ((__pyx_v_pConstraint->op != SQLITE_INDEX_CONSTRAINT_EQ) != 0);
     if (__pyx_t_5) {
 
-      /* "vtfunc.pyx":425
+      /* "vtfunc.pyx":429
  *             continue
  *         if pConstraint.op != SQLITE_INDEX_CONSTRAINT_EQ:
  *             continue             # <<<<<<<<<<<<<<
@@ -4393,7 +4484,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
       goto __pyx_L3_continue;
 
-      /* "vtfunc.pyx":424
+      /* "vtfunc.pyx":428
  *         if not pConstraint.usable:
  *             continue
  *         if pConstraint.op != SQLITE_INDEX_CONSTRAINT_EQ:             # <<<<<<<<<<<<<<
@@ -4402,47 +4493,47 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     }
 
-    /* "vtfunc.pyx":427
+    /* "vtfunc.pyx":431
  *             continue
  * 
  *         columns.append(table_func_cls.params[pConstraint.iColumn -             # <<<<<<<<<<<<<<
  *                                              table_func_cls._ncols])
  *         nArg += 1
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_params); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_pConstraint->iColumn); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_pConstraint->iColumn); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
 
-    /* "vtfunc.pyx":428
+    /* "vtfunc.pyx":432
  * 
  *         columns.append(table_func_cls.params[pConstraint.iColumn -
  *                                              table_func_cls._ncols])             # <<<<<<<<<<<<<<
  *         nArg += 1
  *         pIdxInfo.aConstraintUsage[i].argvIndex = nArg
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_ncols); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 428, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_table_func_cls, __pyx_n_s_ncols); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
 
-    /* "vtfunc.pyx":427
+    /* "vtfunc.pyx":431
  *             continue
  * 
  *         columns.append(table_func_cls.params[pConstraint.iColumn -             # <<<<<<<<<<<<<<
  *                                              table_func_cls._ncols])
  *         nArg += 1
  */
-    __pyx_t_8 = PyNumber_Subtract(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Subtract(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyObject_GetItem(__pyx_t_1, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetItem(__pyx_t_1, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_columns, __pyx_t_7); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 427, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_columns, __pyx_t_7); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "vtfunc.pyx":429
+    /* "vtfunc.pyx":433
  *         columns.append(table_func_cls.params[pConstraint.iColumn -
  *                                              table_func_cls._ncols])
  *         nArg += 1             # <<<<<<<<<<<<<<
@@ -4451,7 +4542,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     __pyx_v_nArg = (__pyx_v_nArg + 1);
 
-    /* "vtfunc.pyx":430
+    /* "vtfunc.pyx":434
  *                                              table_func_cls._ncols])
  *         nArg += 1
  *         pIdxInfo.aConstraintUsage[i].argvIndex = nArg             # <<<<<<<<<<<<<<
@@ -4460,7 +4551,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     (__pyx_v_pIdxInfo->aConstraintUsage[__pyx_v_i]).argvIndex = __pyx_v_nArg;
 
-    /* "vtfunc.pyx":431
+    /* "vtfunc.pyx":435
  *         nArg += 1
  *         pIdxInfo.aConstraintUsage[i].argvIndex = nArg
  *         pIdxInfo.aConstraintUsage[i].omit = 1             # <<<<<<<<<<<<<<
@@ -4471,7 +4562,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     __pyx_L3_continue:;
   }
 
-  /* "vtfunc.pyx":433
+  /* "vtfunc.pyx":437
  *         pIdxInfo.aConstraintUsage[i].omit = 1
  * 
  *     if nArg > 0:             # <<<<<<<<<<<<<<
@@ -4481,7 +4572,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   __pyx_t_5 = ((__pyx_v_nArg > 0) != 0);
   if (__pyx_t_5) {
 
-    /* "vtfunc.pyx":434
+    /* "vtfunc.pyx":438
  * 
  *     if nArg > 0:
  *         if nArg == nParams:             # <<<<<<<<<<<<<<
@@ -4491,7 +4582,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     __pyx_t_5 = ((__pyx_v_nArg == __pyx_v_nParams) != 0);
     if (__pyx_t_5) {
 
-      /* "vtfunc.pyx":436
+      /* "vtfunc.pyx":440
  *         if nArg == nParams:
  *             # All parameters are present, this is ideal.
  *             pIdxInfo.estimatedCost = <double>1             # <<<<<<<<<<<<<<
@@ -4500,7 +4591,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
       __pyx_v_pIdxInfo->estimatedCost = ((double)1);
 
-      /* "vtfunc.pyx":437
+      /* "vtfunc.pyx":441
  *             # All parameters are present, this is ideal.
  *             pIdxInfo.estimatedCost = <double>1
  *             pIdxInfo.estimatedRows = 10             # <<<<<<<<<<<<<<
@@ -4509,7 +4600,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
       __pyx_v_pIdxInfo->estimatedRows = 10;
 
-      /* "vtfunc.pyx":434
+      /* "vtfunc.pyx":438
  * 
  *     if nArg > 0:
  *         if nArg == nParams:             # <<<<<<<<<<<<<<
@@ -4519,7 +4610,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
       goto __pyx_L8;
     }
 
-    /* "vtfunc.pyx":440
+    /* "vtfunc.pyx":444
  *         else:
  *             # Penalize score based on number of missing params.
  *             pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)             # <<<<<<<<<<<<<<
@@ -4529,7 +4620,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     /*else*/ {
       __pyx_v_pIdxInfo->estimatedCost = (((double)10000000000000.0) * ((double)(__pyx_v_nParams - __pyx_v_nArg)));
 
-      /* "vtfunc.pyx":441
+      /* "vtfunc.pyx":445
  *             # Penalize score based on number of missing params.
  *             pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)
  *             pIdxInfo.estimatedRows = 10 ** (nParams - nArg)             # <<<<<<<<<<<<<<
@@ -4540,22 +4631,22 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     }
     __pyx_L8:;
 
-    /* "vtfunc.pyx":442
+    /* "vtfunc.pyx":446
  *             pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)
  *             pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
  *         joinedCols = encode(','.join(columns))             # <<<<<<<<<<<<<<
  *         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
  *         memcpy(idxStr, <char *>joinedCols, len(joinedCols))
  */
-    __pyx_t_7 = __Pyx_PyString_Join(__pyx_kp_s__3, __pyx_v_columns); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 442, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyString_Join(__pyx_kp_s__3, __pyx_v_columns); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 446, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __pyx_f_6vtfunc_encode(__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 442, __pyx_L1_error)
+    __pyx_t_8 = __pyx_f_6vtfunc_encode(__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 446, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_joinedCols = ((PyObject*)__pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "vtfunc.pyx":443
+    /* "vtfunc.pyx":447
  *             pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
  *         joinedCols = encode(','.join(columns))
  *         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))             # <<<<<<<<<<<<<<
@@ -4564,12 +4655,12 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     if (unlikely(__pyx_v_joinedCols == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 443, __pyx_L1_error)
+      __PYX_ERR(0, 447, __pyx_L1_error)
     }
-    __pyx_t_2 = PyBytes_GET_SIZE(__pyx_v_joinedCols); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 443, __pyx_L1_error)
+    __pyx_t_2 = PyBytes_GET_SIZE(__pyx_v_joinedCols); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 447, __pyx_L1_error)
     __pyx_v_idxStr = ((char *)sqlite3_malloc(((__pyx_t_2 + 1) * (sizeof(char)))));
 
-    /* "vtfunc.pyx":444
+    /* "vtfunc.pyx":448
  *         joinedCols = encode(','.join(columns))
  *         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
  *         memcpy(idxStr, <char *>joinedCols, len(joinedCols))             # <<<<<<<<<<<<<<
@@ -4578,17 +4669,17 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     if (unlikely(__pyx_v_joinedCols == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-      __PYX_ERR(0, 444, __pyx_L1_error)
+      __PYX_ERR(0, 448, __pyx_L1_error)
     }
-    __pyx_t_10 = __Pyx_PyBytes_AsWritableString(__pyx_v_joinedCols); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 444, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyBytes_AsWritableString(__pyx_v_joinedCols); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 448, __pyx_L1_error)
     if (unlikely(__pyx_v_joinedCols == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 444, __pyx_L1_error)
+      __PYX_ERR(0, 448, __pyx_L1_error)
     }
-    __pyx_t_2 = PyBytes_GET_SIZE(__pyx_v_joinedCols); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 444, __pyx_L1_error)
+    __pyx_t_2 = PyBytes_GET_SIZE(__pyx_v_joinedCols); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 448, __pyx_L1_error)
     memcpy(__pyx_v_idxStr, ((char *)__pyx_t_10), __pyx_t_2);
 
-    /* "vtfunc.pyx":445
+    /* "vtfunc.pyx":449
  *         idxStr = <char *>sqlite3_malloc((len(joinedCols) + 1) * sizeof(char))
  *         memcpy(idxStr, <char *>joinedCols, len(joinedCols))
  *         idxStr[len(joinedCols)] = '\x00'             # <<<<<<<<<<<<<<
@@ -4597,12 +4688,12 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     if (unlikely(__pyx_v_joinedCols == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 445, __pyx_L1_error)
+      __PYX_ERR(0, 449, __pyx_L1_error)
     }
-    __pyx_t_2 = PyBytes_GET_SIZE(__pyx_v_joinedCols); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 445, __pyx_L1_error)
+    __pyx_t_2 = PyBytes_GET_SIZE(__pyx_v_joinedCols); if (unlikely(__pyx_t_2 == ((Py_ssize_t)-1))) __PYX_ERR(0, 449, __pyx_L1_error)
     (__pyx_v_idxStr[__pyx_t_2]) = '\x00';
 
-    /* "vtfunc.pyx":446
+    /* "vtfunc.pyx":450
  *         memcpy(idxStr, <char *>joinedCols, len(joinedCols))
  *         idxStr[len(joinedCols)] = '\x00'
  *         pIdxInfo.idxStr = idxStr             # <<<<<<<<<<<<<<
@@ -4611,7 +4702,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     __pyx_v_pIdxInfo->idxStr = __pyx_v_idxStr;
 
-    /* "vtfunc.pyx":447
+    /* "vtfunc.pyx":451
  *         idxStr[len(joinedCols)] = '\x00'
  *         pIdxInfo.idxStr = idxStr
  *         pIdxInfo.needToFreeIdxStr = 0             # <<<<<<<<<<<<<<
@@ -4620,7 +4711,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
  */
     __pyx_v_pIdxInfo->needToFreeIdxStr = 0;
 
-    /* "vtfunc.pyx":433
+    /* "vtfunc.pyx":437
  *         pIdxInfo.aConstraintUsage[i].omit = 1
  * 
  *     if nArg > 0:             # <<<<<<<<<<<<<<
@@ -4630,7 +4721,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
     goto __pyx_L7;
   }
 
-  /* "vtfunc.pyx":449
+  /* "vtfunc.pyx":453
  *         pIdxInfo.needToFreeIdxStr = 0
  *     else:
  *         pIdxInfo.estimatedCost = DBL_MAX             # <<<<<<<<<<<<<<
@@ -4640,7 +4731,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   /*else*/ {
     __pyx_v_pIdxInfo->estimatedCost = DBL_MAX;
 
-    /* "vtfunc.pyx":450
+    /* "vtfunc.pyx":454
  *     else:
  *         pIdxInfo.estimatedCost = DBL_MAX
  *         pIdxInfo.estimatedRows = 100000             # <<<<<<<<<<<<<<
@@ -4651,7 +4742,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   }
   __pyx_L7:;
 
-  /* "vtfunc.pyx":451
+  /* "vtfunc.pyx":455
  *         pIdxInfo.estimatedCost = DBL_MAX
  *         pIdxInfo.estimatedRows = 100000
  *     return SQLITE_OK             # <<<<<<<<<<<<<<
@@ -4661,7 +4752,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   __pyx_r = SQLITE_OK;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":407
+  /* "vtfunc.pyx":411
  * 
  * 
  * cdef int pwBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \             # <<<<<<<<<<<<<<
@@ -4688,7 +4779,7 @@ static int __pyx_f_6vtfunc_pwBestIndex(sqlite3_vtab *__pyx_v_pBase, sqlite3_inde
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":459
+/* "vtfunc.pyx":463
  *         object table_function
  * 
  *     def __cinit__(self, table_function):             # <<<<<<<<<<<<<<
@@ -4722,7 +4813,7 @@ static int __pyx_pw_6vtfunc_18_TableFunctionImpl_1__cinit__(PyObject *__pyx_v_se
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 459, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 463, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -4733,7 +4824,7 @@ static int __pyx_pw_6vtfunc_18_TableFunctionImpl_1__cinit__(PyObject *__pyx_v_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 459, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 463, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("vtfunc._TableFunctionImpl.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4751,7 +4842,7 @@ static int __pyx_pf_6vtfunc_18_TableFunctionImpl___cinit__(struct __pyx_obj_6vtf
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "vtfunc.pyx":460
+  /* "vtfunc.pyx":464
  * 
  *     def __cinit__(self, table_function):
  *         self.table_function = table_function             # <<<<<<<<<<<<<<
@@ -4764,7 +4855,7 @@ static int __pyx_pf_6vtfunc_18_TableFunctionImpl___cinit__(struct __pyx_obj_6vtf
   __Pyx_DECREF(__pyx_v_self->table_function);
   __pyx_v_self->table_function = __pyx_v_table_function;
 
-  /* "vtfunc.pyx":459
+  /* "vtfunc.pyx":463
  *         object table_function
  * 
  *     def __cinit__(self, table_function):             # <<<<<<<<<<<<<<
@@ -4778,7 +4869,7 @@ static int __pyx_pf_6vtfunc_18_TableFunctionImpl___cinit__(struct __pyx_obj_6vtf
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":462
+/* "vtfunc.pyx":466
  *         self.table_function = table_function
  * 
  *     cdef create_module(self, pysqlite_Connection* sqlite_conn):             # <<<<<<<<<<<<<<
@@ -4798,22 +4889,22 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
   char const *__pyx_t_4;
   __Pyx_RefNannySetupContext("create_module", 0);
 
-  /* "vtfunc.pyx":464
+  /* "vtfunc.pyx":468
  *     cdef create_module(self, pysqlite_Connection* sqlite_conn):
  *         cdef:
  *             bytes name = encode(self.table_function.name)             # <<<<<<<<<<<<<<
  *             sqlite3 *db = sqlite_conn.db
  *             int rc
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->table_function, __pyx_n_s_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->table_function, __pyx_n_s_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 468, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_f_6vtfunc_encode(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_6vtfunc_encode(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 468, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_name = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":465
+  /* "vtfunc.pyx":469
  *         cdef:
  *             bytes name = encode(self.table_function.name)
  *             sqlite3 *db = sqlite_conn.db             # <<<<<<<<<<<<<<
@@ -4823,7 +4914,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
   __pyx_t_3 = __pyx_v_sqlite_conn->db;
   __pyx_v_db = __pyx_t_3;
 
-  /* "vtfunc.pyx":469
+  /* "vtfunc.pyx":473
  * 
  *         # Populate the SQLite module struct members.
  *         self.module.iVersion = 0             # <<<<<<<<<<<<<<
@@ -4832,7 +4923,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.iVersion = 0;
 
-  /* "vtfunc.pyx":470
+  /* "vtfunc.pyx":474
  *         # Populate the SQLite module struct members.
  *         self.module.iVersion = 0
  *         self.module.xCreate = NULL  # NULL indicates eponymous *only*.             # <<<<<<<<<<<<<<
@@ -4841,7 +4932,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xCreate = NULL;
 
-  /* "vtfunc.pyx":471
+  /* "vtfunc.pyx":475
  *         self.module.iVersion = 0
  *         self.module.xCreate = NULL  # NULL indicates eponymous *only*.
  *         self.module.xConnect = pwConnect             # <<<<<<<<<<<<<<
@@ -4850,7 +4941,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xConnect = __pyx_f_6vtfunc_pwConnect;
 
-  /* "vtfunc.pyx":472
+  /* "vtfunc.pyx":476
  *         self.module.xCreate = NULL  # NULL indicates eponymous *only*.
  *         self.module.xConnect = pwConnect
  *         self.module.xBestIndex = pwBestIndex             # <<<<<<<<<<<<<<
@@ -4859,7 +4950,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xBestIndex = __pyx_f_6vtfunc_pwBestIndex;
 
-  /* "vtfunc.pyx":473
+  /* "vtfunc.pyx":477
  *         self.module.xConnect = pwConnect
  *         self.module.xBestIndex = pwBestIndex
  *         self.module.xDisconnect = pwDisconnect             # <<<<<<<<<<<<<<
@@ -4868,7 +4959,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xDisconnect = __pyx_f_6vtfunc_pwDisconnect;
 
-  /* "vtfunc.pyx":474
+  /* "vtfunc.pyx":478
  *         self.module.xBestIndex = pwBestIndex
  *         self.module.xDisconnect = pwDisconnect
  *         self.module.xDestroy = NULL             # <<<<<<<<<<<<<<
@@ -4877,7 +4968,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xDestroy = NULL;
 
-  /* "vtfunc.pyx":475
+  /* "vtfunc.pyx":479
  *         self.module.xDisconnect = pwDisconnect
  *         self.module.xDestroy = NULL
  *         self.module.xOpen = pwOpen             # <<<<<<<<<<<<<<
@@ -4886,7 +4977,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xOpen = __pyx_f_6vtfunc_pwOpen;
 
-  /* "vtfunc.pyx":476
+  /* "vtfunc.pyx":480
  *         self.module.xDestroy = NULL
  *         self.module.xOpen = pwOpen
  *         self.module.xClose = pwClose             # <<<<<<<<<<<<<<
@@ -4895,7 +4986,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xClose = __pyx_f_6vtfunc_pwClose;
 
-  /* "vtfunc.pyx":477
+  /* "vtfunc.pyx":481
  *         self.module.xOpen = pwOpen
  *         self.module.xClose = pwClose
  *         self.module.xFilter = pwFilter             # <<<<<<<<<<<<<<
@@ -4904,7 +4995,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xFilter = __pyx_f_6vtfunc_pwFilter;
 
-  /* "vtfunc.pyx":478
+  /* "vtfunc.pyx":482
  *         self.module.xClose = pwClose
  *         self.module.xFilter = pwFilter
  *         self.module.xNext = pwNext             # <<<<<<<<<<<<<<
@@ -4913,7 +5004,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xNext = __pyx_f_6vtfunc_pwNext;
 
-  /* "vtfunc.pyx":479
+  /* "vtfunc.pyx":483
  *         self.module.xFilter = pwFilter
  *         self.module.xNext = pwNext
  *         self.module.xEof = pwEof             # <<<<<<<<<<<<<<
@@ -4922,7 +5013,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xEof = __pyx_f_6vtfunc_pwEof;
 
-  /* "vtfunc.pyx":480
+  /* "vtfunc.pyx":484
  *         self.module.xNext = pwNext
  *         self.module.xEof = pwEof
  *         self.module.xColumn = pwColumn             # <<<<<<<<<<<<<<
@@ -4931,7 +5022,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xColumn = __pyx_f_6vtfunc_pwColumn;
 
-  /* "vtfunc.pyx":481
+  /* "vtfunc.pyx":485
  *         self.module.xEof = pwEof
  *         self.module.xColumn = pwColumn
  *         self.module.xRowid = pwRowid             # <<<<<<<<<<<<<<
@@ -4940,7 +5031,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xRowid = __pyx_f_6vtfunc_pwRowid;
 
-  /* "vtfunc.pyx":482
+  /* "vtfunc.pyx":486
  *         self.module.xColumn = pwColumn
  *         self.module.xRowid = pwRowid
  *         self.module.xUpdate = NULL             # <<<<<<<<<<<<<<
@@ -4949,7 +5040,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xUpdate = NULL;
 
-  /* "vtfunc.pyx":483
+  /* "vtfunc.pyx":487
  *         self.module.xRowid = pwRowid
  *         self.module.xUpdate = NULL
  *         self.module.xBegin = NULL             # <<<<<<<<<<<<<<
@@ -4958,7 +5049,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xBegin = NULL;
 
-  /* "vtfunc.pyx":484
+  /* "vtfunc.pyx":488
  *         self.module.xUpdate = NULL
  *         self.module.xBegin = NULL
  *         self.module.xSync = NULL             # <<<<<<<<<<<<<<
@@ -4967,7 +5058,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xSync = NULL;
 
-  /* "vtfunc.pyx":485
+  /* "vtfunc.pyx":489
  *         self.module.xBegin = NULL
  *         self.module.xSync = NULL
  *         self.module.xCommit = NULL             # <<<<<<<<<<<<<<
@@ -4976,7 +5067,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xCommit = NULL;
 
-  /* "vtfunc.pyx":486
+  /* "vtfunc.pyx":490
  *         self.module.xSync = NULL
  *         self.module.xCommit = NULL
  *         self.module.xRollback = NULL             # <<<<<<<<<<<<<<
@@ -4985,7 +5076,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xRollback = NULL;
 
-  /* "vtfunc.pyx":487
+  /* "vtfunc.pyx":491
  *         self.module.xCommit = NULL
  *         self.module.xRollback = NULL
  *         self.module.xFindFunction = NULL             # <<<<<<<<<<<<<<
@@ -4994,7 +5085,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xFindFunction = NULL;
 
-  /* "vtfunc.pyx":488
+  /* "vtfunc.pyx":492
  *         self.module.xRollback = NULL
  *         self.module.xFindFunction = NULL
  *         self.module.xRename = NULL             # <<<<<<<<<<<<<<
@@ -5003,7 +5094,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_self->module.xRename = NULL;
 
-  /* "vtfunc.pyx":492
+  /* "vtfunc.pyx":496
  *         rc = sqlite3_create_module(
  *             db,
  *             <const char *>name,             # <<<<<<<<<<<<<<
@@ -5012,11 +5103,11 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   if (unlikely(__pyx_v_name == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 492, __pyx_L1_error)
+    __PYX_ERR(0, 496, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyBytes_AsString(__pyx_v_name); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 492, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBytes_AsString(__pyx_v_name); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 496, __pyx_L1_error)
 
-  /* "vtfunc.pyx":490
+  /* "vtfunc.pyx":494
  *         self.module.xRename = NULL
  * 
  *         rc = sqlite3_create_module(             # <<<<<<<<<<<<<<
@@ -5025,7 +5116,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   __pyx_v_rc = sqlite3_create_module(__pyx_v_db, ((char const *)__pyx_t_4), (&__pyx_v_self->module), ((void *)__pyx_v_self->table_function));
 
-  /* "vtfunc.pyx":496
+  /* "vtfunc.pyx":500
  *             <void *>(self.table_function))
  * 
  *         Py_INCREF(self)             # <<<<<<<<<<<<<<
@@ -5034,7 +5125,7 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  */
   Py_INCREF(((PyObject *)__pyx_v_self));
 
-  /* "vtfunc.pyx":498
+  /* "vtfunc.pyx":502
  *         Py_INCREF(self)
  * 
  *         return rc == SQLITE_OK             # <<<<<<<<<<<<<<
@@ -5042,13 +5133,13 @@ static PyObject *__pyx_f_6vtfunc_18_TableFunctionImpl_create_module(struct __pyx
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyBool_FromLong((__pyx_v_rc == SQLITE_OK)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 498, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong((__pyx_v_rc == SQLITE_OK)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 502, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":462
+  /* "vtfunc.pyx":466
  *         self.table_function = table_function
  * 
  *     cdef create_module(self, pysqlite_Connection* sqlite_conn):             # <<<<<<<<<<<<<<
@@ -5176,7 +5267,7 @@ static PyObject *__pyx_pf_6vtfunc_18_TableFunctionImpl_4__setstate_cython__(CYTH
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":525
+/* "vtfunc.pyx":530
  * 
  *     @classmethod
  *     def register(cls, conn):             # <<<<<<<<<<<<<<
@@ -5216,11 +5307,11 @@ static PyObject *__pyx_pw_6vtfunc_13TableFunction_1register(PyObject *__pyx_self
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_conn)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("register", 1, 2, 2, 1); __PYX_ERR(0, 525, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("register", 1, 2, 2, 1); __PYX_ERR(0, 530, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "register") < 0)) __PYX_ERR(0, 525, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "register") < 0)) __PYX_ERR(0, 530, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5233,7 +5324,7 @@ static PyObject *__pyx_pw_6vtfunc_13TableFunction_1register(PyObject *__pyx_self
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("register", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 525, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("register", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 530, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("vtfunc.TableFunction.register", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5255,52 +5346,52 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_register(CYTHON_UNUSED PyObjec
   Py_ssize_t __pyx_t_3;
   __Pyx_RefNannySetupContext("register", 0);
 
-  /* "vtfunc.pyx":526
+  /* "vtfunc.pyx":531
  *     @classmethod
  *     def register(cls, conn):
  *         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)             # <<<<<<<<<<<<<<
  *         impl.create_module(<pysqlite_Connection *>conn)
  *         cls._ncols = len(cls.columns)
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 526, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_cls);
   __Pyx_GIVEREF(__pyx_v_cls);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_cls);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_6vtfunc__TableFunctionImpl), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 526, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_6vtfunc__TableFunctionImpl), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 531, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_impl = ((struct __pyx_obj_6vtfunc__TableFunctionImpl *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":527
+  /* "vtfunc.pyx":532
  *     def register(cls, conn):
  *         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
  *         impl.create_module(<pysqlite_Connection *>conn)             # <<<<<<<<<<<<<<
  *         cls._ncols = len(cls.columns)
  * 
  */
-  __pyx_t_2 = ((struct __pyx_vtabstruct_6vtfunc__TableFunctionImpl *)__pyx_v_impl->__pyx_vtab)->create_module(__pyx_v_impl, ((pysqlite_Connection *)__pyx_v_conn)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_6vtfunc__TableFunctionImpl *)__pyx_v_impl->__pyx_vtab)->create_module(__pyx_v_impl, ((pysqlite_Connection *)__pyx_v_conn)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 532, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":528
+  /* "vtfunc.pyx":533
  *         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
  *         impl.create_module(<pysqlite_Connection *>conn)
  *         cls._ncols = len(cls.columns)             # <<<<<<<<<<<<<<
  * 
  *     def initialize(self, **filters):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_cls, __pyx_n_s_columns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_cls, __pyx_n_s_columns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 528, __pyx_L1_error)
+  __pyx_t_3 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_cls, __pyx_n_s_ncols, __pyx_t_2) < 0) __PYX_ERR(0, 528, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_cls, __pyx_n_s_ncols, __pyx_t_2) < 0) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":525
+  /* "vtfunc.pyx":530
  * 
  *     @classmethod
  *     def register(cls, conn):             # <<<<<<<<<<<<<<
@@ -5323,7 +5414,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_register(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":530
+/* "vtfunc.pyx":535
  *         cls._ncols = len(cls.columns)
  * 
  *     def initialize(self, **filters):             # <<<<<<<<<<<<<<
@@ -5361,7 +5452,7 @@ static PyObject *__pyx_pw_6vtfunc_13TableFunction_3initialize(PyObject *__pyx_se
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_filters, values, pos_args, "initialize") < 0)) __PYX_ERR(0, 530, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_filters, values, pos_args, "initialize") < 0)) __PYX_ERR(0, 535, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -5372,7 +5463,7 @@ static PyObject *__pyx_pw_6vtfunc_13TableFunction_3initialize(PyObject *__pyx_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("initialize", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 530, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("initialize", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 535, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_DECREF(__pyx_v_filters); __pyx_v_filters = 0;
   __Pyx_AddTraceback("vtfunc.TableFunction.initialize", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -5392,7 +5483,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_2initialize(CYTHON_UNUSED PyOb
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("initialize", 0);
 
-  /* "vtfunc.pyx":531
+  /* "vtfunc.pyx":536
  * 
  *     def initialize(self, **filters):
  *         raise NotImplementedError             # <<<<<<<<<<<<<<
@@ -5400,9 +5491,9 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_2initialize(CYTHON_UNUSED PyOb
  *     def iterate(self, idx):
  */
   __Pyx_Raise(__pyx_builtin_NotImplementedError, 0, 0, 0);
-  __PYX_ERR(0, 531, __pyx_L1_error)
+  __PYX_ERR(0, 536, __pyx_L1_error)
 
-  /* "vtfunc.pyx":530
+  /* "vtfunc.pyx":535
  *         cls._ncols = len(cls.columns)
  * 
  *     def initialize(self, **filters):             # <<<<<<<<<<<<<<
@@ -5419,7 +5510,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_2initialize(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":533
+/* "vtfunc.pyx":538
  *         raise NotImplementedError
  * 
  *     def iterate(self, idx):             # <<<<<<<<<<<<<<
@@ -5459,11 +5550,11 @@ static PyObject *__pyx_pw_6vtfunc_13TableFunction_5iterate(PyObject *__pyx_self,
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_idx)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iterate", 1, 2, 2, 1); __PYX_ERR(0, 533, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iterate", 1, 2, 2, 1); __PYX_ERR(0, 538, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate") < 0)) __PYX_ERR(0, 533, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iterate") < 0)) __PYX_ERR(0, 538, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5476,7 +5567,7 @@ static PyObject *__pyx_pw_6vtfunc_13TableFunction_5iterate(PyObject *__pyx_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iterate", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 533, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iterate", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 538, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("vtfunc.TableFunction.iterate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5494,7 +5585,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_4iterate(CYTHON_UNUSED PyObjec
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("iterate", 0);
 
-  /* "vtfunc.pyx":534
+  /* "vtfunc.pyx":539
  * 
  *     def iterate(self, idx):
  *         raise NotImplementedError             # <<<<<<<<<<<<<<
@@ -5502,9 +5593,9 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_4iterate(CYTHON_UNUSED PyObjec
  *     @classmethod
  */
   __Pyx_Raise(__pyx_builtin_NotImplementedError, 0, 0, 0);
-  __PYX_ERR(0, 534, __pyx_L1_error)
+  __PYX_ERR(0, 539, __pyx_L1_error)
 
-  /* "vtfunc.pyx":533
+  /* "vtfunc.pyx":538
  *         raise NotImplementedError
  * 
  *     def iterate(self, idx):             # <<<<<<<<<<<<<<
@@ -5521,7 +5612,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_4iterate(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":537
+/* "vtfunc.pyx":542
  * 
  *     @classmethod
  *     def get_table_columns_declaration(cls):             # <<<<<<<<<<<<<<
@@ -5559,34 +5650,34 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
   int __pyx_t_8;
   __Pyx_RefNannySetupContext("get_table_columns_declaration", 0);
 
-  /* "vtfunc.pyx":538
+  /* "vtfunc.pyx":543
  *     @classmethod
  *     def get_table_columns_declaration(cls):
  *         cdef list accum = []             # <<<<<<<<<<<<<<
  * 
  *         for column in cls.columns:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 543, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_accum = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":540
+  /* "vtfunc.pyx":545
  *         cdef list accum = []
  * 
  *         for column in cls.columns:             # <<<<<<<<<<<<<<
  *             if isinstance(column, tuple):
  *                 if len(column) != 2:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_cls, __pyx_n_s_columns); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 540, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_cls, __pyx_n_s_columns); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 545, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 540, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 545, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 540, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 545, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -5594,17 +5685,17 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 540, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 545, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 540, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 545, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 540, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_3); __Pyx_INCREF(__pyx_t_1); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 545, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 540, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 545, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -5614,7 +5705,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 540, __pyx_L1_error)
+          else __PYX_ERR(0, 545, __pyx_L1_error)
         }
         break;
       }
@@ -5623,7 +5714,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
     __Pyx_XDECREF_SET(__pyx_v_column, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "vtfunc.pyx":541
+    /* "vtfunc.pyx":546
  * 
  *         for column in cls.columns:
  *             if isinstance(column, tuple):             # <<<<<<<<<<<<<<
@@ -5634,31 +5725,31 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
     __pyx_t_6 = (__pyx_t_5 != 0);
     if (__pyx_t_6) {
 
-      /* "vtfunc.pyx":542
+      /* "vtfunc.pyx":547
  *         for column in cls.columns:
  *             if isinstance(column, tuple):
  *                 if len(column) != 2:             # <<<<<<<<<<<<<<
  *                     raise ValueError('Column must be either a string or a '
  *                                      '2-tuple of name, type')
  */
-      __pyx_t_7 = PyObject_Length(__pyx_v_column); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 542, __pyx_L1_error)
+      __pyx_t_7 = PyObject_Length(__pyx_v_column); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 547, __pyx_L1_error)
       __pyx_t_6 = ((__pyx_t_7 != 2) != 0);
       if (__pyx_t_6) {
 
-        /* "vtfunc.pyx":543
+        /* "vtfunc.pyx":548
  *             if isinstance(column, tuple):
  *                 if len(column) != 2:
  *                     raise ValueError('Column must be either a string or a '             # <<<<<<<<<<<<<<
  *                                      '2-tuple of name, type')
  *                 accum.append('%s %s' % column)
  */
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 543, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 548, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_Raise(__pyx_t_1, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __PYX_ERR(0, 543, __pyx_L1_error)
+        __PYX_ERR(0, 548, __pyx_L1_error)
 
-        /* "vtfunc.pyx":542
+        /* "vtfunc.pyx":547
  *         for column in cls.columns:
  *             if isinstance(column, tuple):
  *                 if len(column) != 2:             # <<<<<<<<<<<<<<
@@ -5667,19 +5758,19 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
  */
       }
 
-      /* "vtfunc.pyx":545
+      /* "vtfunc.pyx":550
  *                     raise ValueError('Column must be either a string or a '
  *                                      '2-tuple of name, type')
  *                 accum.append('%s %s' % column)             # <<<<<<<<<<<<<<
  *             else:
  *                 accum.append(column)
  */
-      __pyx_t_1 = __Pyx_PyString_Format(__pyx_kp_s_s_s, __pyx_v_column); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 545, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyString_Format(__pyx_kp_s_s_s, __pyx_v_column); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 550, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_accum, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 545, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_accum, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 550, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "vtfunc.pyx":541
+      /* "vtfunc.pyx":546
  * 
  *         for column in cls.columns:
  *             if isinstance(column, tuple):             # <<<<<<<<<<<<<<
@@ -5689,7 +5780,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
       goto __pyx_L5;
     }
 
-    /* "vtfunc.pyx":547
+    /* "vtfunc.pyx":552
  *                 accum.append('%s %s' % column)
  *             else:
  *                 accum.append(column)             # <<<<<<<<<<<<<<
@@ -5697,11 +5788,11 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
  *         for param in cls.params:
  */
     /*else*/ {
-      __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_accum, __pyx_v_column); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 547, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_accum, __pyx_v_column); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 552, __pyx_L1_error)
     }
     __pyx_L5:;
 
-    /* "vtfunc.pyx":540
+    /* "vtfunc.pyx":545
  *         cdef list accum = []
  * 
  *         for column in cls.columns:             # <<<<<<<<<<<<<<
@@ -5711,22 +5802,22 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "vtfunc.pyx":549
+  /* "vtfunc.pyx":554
  *                 accum.append(column)
  * 
  *         for param in cls.params:             # <<<<<<<<<<<<<<
  *             accum.append('%s HIDDEN' % param)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_cls, __pyx_n_s_params); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 549, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_cls, __pyx_n_s_params); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 554, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
     __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1); __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 549, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 554, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 549, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 554, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   for (;;) {
@@ -5734,17 +5825,17 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 549, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 554, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 549, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 554, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 549, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 554, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 549, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 554, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -5754,7 +5845,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 549, __pyx_L1_error)
+          else __PYX_ERR(0, 554, __pyx_L1_error)
         }
         break;
       }
@@ -5763,19 +5854,19 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
     __Pyx_XDECREF_SET(__pyx_v_param, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "vtfunc.pyx":550
+    /* "vtfunc.pyx":555
  * 
  *         for param in cls.params:
  *             accum.append('%s HIDDEN' % param)             # <<<<<<<<<<<<<<
  * 
  *         return ', '.join(accum)
  */
-    __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_s_HIDDEN, __pyx_v_param); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 550, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyString_Format(__pyx_kp_s_s_HIDDEN, __pyx_v_param); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 555, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_accum, __pyx_t_2); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 550, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_accum, __pyx_t_2); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 555, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "vtfunc.pyx":549
+    /* "vtfunc.pyx":554
  *                 accum.append(column)
  * 
  *         for param in cls.params:             # <<<<<<<<<<<<<<
@@ -5785,7 +5876,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":552
+  /* "vtfunc.pyx":557
  *             accum.append('%s HIDDEN' % param)
  * 
  *         return ', '.join(accum)             # <<<<<<<<<<<<<<
@@ -5793,13 +5884,13 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyString_Join(__pyx_kp_s__8, __pyx_v_accum); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyString_Join(__pyx_kp_s__8, __pyx_v_accum); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":537
+  /* "vtfunc.pyx":542
  * 
  *     @classmethod
  *     def get_table_columns_declaration(cls):             # <<<<<<<<<<<<<<
@@ -5822,7 +5913,7 @@ static PyObject *__pyx_pf_6vtfunc_13TableFunction_6get_table_columns_declaration
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":555
+/* "vtfunc.pyx":560
  * 
  * 
  * def aggressive_busy_handler(sqlite_conn, timeout=5000):             # <<<<<<<<<<<<<<
@@ -5867,7 +5958,7 @@ static PyObject *__pyx_pw_6vtfunc_1aggressive_busy_handler(PyObject *__pyx_self,
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "aggressive_busy_handler") < 0)) __PYX_ERR(0, 555, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "aggressive_busy_handler") < 0)) __PYX_ERR(0, 560, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5883,7 +5974,7 @@ static PyObject *__pyx_pw_6vtfunc_1aggressive_busy_handler(PyObject *__pyx_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("aggressive_busy_handler", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 555, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("aggressive_busy_handler", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 560, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("vtfunc.aggressive_busy_handler", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5905,17 +5996,17 @@ static PyObject *__pyx_pf_6vtfunc_aggressive_busy_handler(CYTHON_UNUSED PyObject
   sqlite3 *__pyx_t_2;
   __Pyx_RefNannySetupContext("aggressive_busy_handler", 0);
 
-  /* "vtfunc.pyx":557
+  /* "vtfunc.pyx":562
  * def aggressive_busy_handler(sqlite_conn, timeout=5000):
  *     cdef:
  *         int n = timeout             # <<<<<<<<<<<<<<
  *         sqlite3 *db = (<pysqlite_Connection *>sqlite_conn).db
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_timeout); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_timeout); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 562, __pyx_L1_error)
   __pyx_v_n = __pyx_t_1;
 
-  /* "vtfunc.pyx":558
+  /* "vtfunc.pyx":563
  *     cdef:
  *         int n = timeout
  *         sqlite3 *db = (<pysqlite_Connection *>sqlite_conn).db             # <<<<<<<<<<<<<<
@@ -5925,7 +6016,7 @@ static PyObject *__pyx_pf_6vtfunc_aggressive_busy_handler(CYTHON_UNUSED PyObject
   __pyx_t_2 = ((pysqlite_Connection *)__pyx_v_sqlite_conn)->db;
   __pyx_v_db = __pyx_t_2;
 
-  /* "vtfunc.pyx":560
+  /* "vtfunc.pyx":565
  *         sqlite3 *db = (<pysqlite_Connection *>sqlite_conn).db
  * 
  *     sqlite3_busy_handler(db, _aggressive_busy_handler, <void *>n)             # <<<<<<<<<<<<<<
@@ -5934,7 +6025,7 @@ static PyObject *__pyx_pf_6vtfunc_aggressive_busy_handler(CYTHON_UNUSED PyObject
  */
   sqlite3_busy_handler(__pyx_v_db, __pyx_f_6vtfunc__aggressive_busy_handler, ((void *)__pyx_v_n));
 
-  /* "vtfunc.pyx":561
+  /* "vtfunc.pyx":566
  * 
  *     sqlite3_busy_handler(db, _aggressive_busy_handler, <void *>n)
  *     return True             # <<<<<<<<<<<<<<
@@ -5946,7 +6037,7 @@ static PyObject *__pyx_pf_6vtfunc_aggressive_busy_handler(CYTHON_UNUSED PyObject
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":555
+  /* "vtfunc.pyx":560
  * 
  * 
  * def aggressive_busy_handler(sqlite_conn, timeout=5000):             # <<<<<<<<<<<<<<
@@ -5964,7 +6055,7 @@ static PyObject *__pyx_pf_6vtfunc_aggressive_busy_handler(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "vtfunc.pyx":564
+/* "vtfunc.pyx":569
  * 
  * 
  * cdef int _aggressive_busy_handler(void *ptr, int n):             # <<<<<<<<<<<<<<
@@ -5981,7 +6072,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("_aggressive_busy_handler", 0);
 
-  /* "vtfunc.pyx":566
+  /* "vtfunc.pyx":571
  * cdef int _aggressive_busy_handler(void *ptr, int n):
  *     cdef:
  *         int busyTimeout = <int>ptr             # <<<<<<<<<<<<<<
@@ -5990,7 +6081,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
   __pyx_v_busyTimeout = ((int)__pyx_v_ptr);
 
-  /* "vtfunc.pyx":569
+  /* "vtfunc.pyx":574
  *         int current, total
  * 
  *     if n < 20:             # <<<<<<<<<<<<<<
@@ -6000,7 +6091,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   __pyx_t_1 = ((__pyx_v_n < 20) != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":570
+    /* "vtfunc.pyx":575
  * 
  *     if n < 20:
  *         current = 25 - (rand() % 10)  # ~20ms             # <<<<<<<<<<<<<<
@@ -6009,7 +6100,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
     __pyx_v_current = (25 - __Pyx_mod_long(rand(), 10));
 
-    /* "vtfunc.pyx":571
+    /* "vtfunc.pyx":576
  *     if n < 20:
  *         current = 25 - (rand() % 10)  # ~20ms
  *         total = n * 20             # <<<<<<<<<<<<<<
@@ -6018,7 +6109,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
     __pyx_v_total = (__pyx_v_n * 20);
 
-    /* "vtfunc.pyx":569
+    /* "vtfunc.pyx":574
  *         int current, total
  * 
  *     if n < 20:             # <<<<<<<<<<<<<<
@@ -6028,7 +6119,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
     goto __pyx_L3;
   }
 
-  /* "vtfunc.pyx":572
+  /* "vtfunc.pyx":577
  *         current = 25 - (rand() % 10)  # ~20ms
  *         total = n * 20
  *     elif n < 40:             # <<<<<<<<<<<<<<
@@ -6038,7 +6129,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   __pyx_t_1 = ((__pyx_v_n < 40) != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":573
+    /* "vtfunc.pyx":578
  *         total = n * 20
  *     elif n < 40:
  *         current = 50 - (rand() % 20)  # ~40ms             # <<<<<<<<<<<<<<
@@ -6047,7 +6138,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
     __pyx_v_current = (50 - __Pyx_mod_long(rand(), 20));
 
-    /* "vtfunc.pyx":574
+    /* "vtfunc.pyx":579
  *     elif n < 40:
  *         current = 50 - (rand() % 20)  # ~40ms
  *         total = 400 + ((n - 20) * 40)             # <<<<<<<<<<<<<<
@@ -6056,7 +6147,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
     __pyx_v_total = (0x190 + ((__pyx_v_n - 20) * 40));
 
-    /* "vtfunc.pyx":572
+    /* "vtfunc.pyx":577
  *         current = 25 - (rand() % 10)  # ~20ms
  *         total = n * 20
  *     elif n < 40:             # <<<<<<<<<<<<<<
@@ -6066,7 +6157,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
     goto __pyx_L3;
   }
 
-  /* "vtfunc.pyx":576
+  /* "vtfunc.pyx":581
  *         total = 400 + ((n - 20) * 40)
  *     else:
  *         current = 120 - (rand() % 40)  # ~100ms             # <<<<<<<<<<<<<<
@@ -6076,7 +6167,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   /*else*/ {
     __pyx_v_current = (0x78 - __Pyx_mod_long(rand(), 40));
 
-    /* "vtfunc.pyx":577
+    /* "vtfunc.pyx":582
  *     else:
  *         current = 120 - (rand() % 40)  # ~100ms
  *         total = 1200 + ((n - 40) * 100)             # <<<<<<<<<<<<<<
@@ -6087,7 +6178,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   }
   __pyx_L3:;
 
-  /* "vtfunc.pyx":579
+  /* "vtfunc.pyx":584
  *         total = 1200 + ((n - 40) * 100)
  * 
  *     if total + current > busyTimeout:             # <<<<<<<<<<<<<<
@@ -6097,7 +6188,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   __pyx_t_1 = (((__pyx_v_total + __pyx_v_current) > __pyx_v_busyTimeout) != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":580
+    /* "vtfunc.pyx":585
  * 
  *     if total + current > busyTimeout:
  *         current = busyTimeout - total             # <<<<<<<<<<<<<<
@@ -6106,7 +6197,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
     __pyx_v_current = (__pyx_v_busyTimeout - __pyx_v_total);
 
-    /* "vtfunc.pyx":579
+    /* "vtfunc.pyx":584
  *         total = 1200 + ((n - 40) * 100)
  * 
  *     if total + current > busyTimeout:             # <<<<<<<<<<<<<<
@@ -6115,7 +6206,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
   }
 
-  /* "vtfunc.pyx":581
+  /* "vtfunc.pyx":586
  *     if total + current > busyTimeout:
  *         current = busyTimeout - total
  *     if current > 0:             # <<<<<<<<<<<<<<
@@ -6125,7 +6216,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   __pyx_t_1 = ((__pyx_v_current > 0) != 0);
   if (__pyx_t_1) {
 
-    /* "vtfunc.pyx":582
+    /* "vtfunc.pyx":587
  *         current = busyTimeout - total
  *     if current > 0:
  *         sqlite3_sleep(current)             # <<<<<<<<<<<<<<
@@ -6134,7 +6225,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
     sqlite3_sleep(__pyx_v_current);
 
-    /* "vtfunc.pyx":583
+    /* "vtfunc.pyx":588
  *     if current > 0:
  *         sqlite3_sleep(current)
  *         return 1             # <<<<<<<<<<<<<<
@@ -6143,7 +6234,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
     __pyx_r = 1;
     goto __pyx_L0;
 
-    /* "vtfunc.pyx":581
+    /* "vtfunc.pyx":586
  *     if total + current > busyTimeout:
  *         current = busyTimeout - total
  *     if current > 0:             # <<<<<<<<<<<<<<
@@ -6152,7 +6243,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
  */
   }
 
-  /* "vtfunc.pyx":584
+  /* "vtfunc.pyx":589
  *         sqlite3_sleep(current)
  *         return 1
  *     return 0             # <<<<<<<<<<<<<<
@@ -6160,7 +6251,7 @@ static int __pyx_f_6vtfunc__aggressive_busy_handler(void *__pyx_v_ptr, int __pyx
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "vtfunc.pyx":564
+  /* "vtfunc.pyx":569
  * 
  * 
  * cdef int _aggressive_busy_handler(void *ptr, int n):             # <<<<<<<<<<<<<<
@@ -6375,6 +6466,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_params, __pyx_k_params, sizeof(__pyx_k_params), 0, 0, 1, 1},
   {&__pyx_n_s_prepare, __pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 0, 1, 1},
   {&__pyx_n_s_print_exc, __pyx_k_print_exc, sizeof(__pyx_k_print_exc), 0, 0, 1, 1},
+  {&__pyx_n_s_print_tracebacks, __pyx_k_print_tracebacks, sizeof(__pyx_k_print_tracebacks), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_qualname, __pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
@@ -6398,13 +6490,13 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_object = __Pyx_GetBuiltinName(__pyx_n_s_object); if (!__pyx_builtin_object) __PYX_ERR(0, 501, __pyx_L1_error)
-  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 279, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 366, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 420, __pyx_L1_error)
+  __pyx_builtin_object = __Pyx_GetBuiltinName(__pyx_n_s_object); if (!__pyx_builtin_object) __PYX_ERR(0, 505, __pyx_L1_error)
+  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 280, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 368, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 424, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
-  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 531, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 543, __pyx_L1_error)
+  __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 536, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 548, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -6436,14 +6528,14 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "vtfunc.pyx":394
+  /* "vtfunc.pyx":397
  *     pCur.stopped = False
  *     try:
  *         row_data = tuple(table_func.iterate(0))             # <<<<<<<<<<<<<<
  *     except StopIteration:
  *         pCur.stopped = True
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_int_0); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 394, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_int_0); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
@@ -6466,87 +6558,87 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "vtfunc.pyx":543
+  /* "vtfunc.pyx":548
  *             if isinstance(column, tuple):
  *                 if len(column) != 2:
  *                     raise ValueError('Column must be either a string or a '             # <<<<<<<<<<<<<<
  *                                      '2-tuple of name, type')
  *                 accum.append('%s %s' % column)
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_Column_must_be_either_a_string_o); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 543, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_Column_must_be_either_a_string_o); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 548, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "vtfunc.pyx":501
+  /* "vtfunc.pyx":505
  * 
  * 
  * class TableFunction(object):             # <<<<<<<<<<<<<<
  *     """
  *     Implements a table-valued function (eponymous-only virtual table) in
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_builtin_object); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 501, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_builtin_object); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 505, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "vtfunc.pyx":525
+  /* "vtfunc.pyx":530
  * 
  *     @classmethod
  *     def register(cls, conn):             # <<<<<<<<<<<<<<
  *         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
  *         impl.create_module(<pysqlite_Connection *>conn)
  */
-  __pyx_tuple__10 = PyTuple_Pack(3, __pyx_n_s_cls, __pyx_n_s_conn, __pyx_n_s_impl); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 525, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(3, __pyx_n_s_cls, __pyx_n_s_conn, __pyx_n_s_impl); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 530, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_register, 525, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 525, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_register, 530, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 530, __pyx_L1_error)
 
-  /* "vtfunc.pyx":530
+  /* "vtfunc.pyx":535
  *         cls._ncols = len(cls.columns)
  * 
  *     def initialize(self, **filters):             # <<<<<<<<<<<<<<
  *         raise NotImplementedError
  * 
  */
-  __pyx_tuple__12 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_filters); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 530, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_filters); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 535, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_initialize, 530, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 530, __pyx_L1_error)
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_initialize, 535, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 535, __pyx_L1_error)
 
-  /* "vtfunc.pyx":533
+  /* "vtfunc.pyx":538
  *         raise NotImplementedError
  * 
  *     def iterate(self, idx):             # <<<<<<<<<<<<<<
  *         raise NotImplementedError
  * 
  */
-  __pyx_tuple__14 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_idx); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 533, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_idx); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 538, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_iterate, 533, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 533, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_iterate, 538, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 538, __pyx_L1_error)
 
-  /* "vtfunc.pyx":537
+  /* "vtfunc.pyx":542
  * 
  *     @classmethod
  *     def get_table_columns_declaration(cls):             # <<<<<<<<<<<<<<
  *         cdef list accum = []
  * 
  */
-  __pyx_tuple__16 = PyTuple_Pack(4, __pyx_n_s_cls, __pyx_n_s_accum, __pyx_n_s_column, __pyx_n_s_param); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 537, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(4, __pyx_n_s_cls, __pyx_n_s_accum, __pyx_n_s_column, __pyx_n_s_param); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 542, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
-  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_get_table_columns_declaration, 537, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 537, __pyx_L1_error)
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_get_table_columns_declaration, 542, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 542, __pyx_L1_error)
 
-  /* "vtfunc.pyx":555
+  /* "vtfunc.pyx":560
  * 
  * 
  * def aggressive_busy_handler(sqlite_conn, timeout=5000):             # <<<<<<<<<<<<<<
  *     cdef:
  *         int n = timeout
  */
-  __pyx_tuple__18 = PyTuple_Pack(4, __pyx_n_s_sqlite_conn, __pyx_n_s_timeout, __pyx_n_s_n, __pyx_n_s_db); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 555, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(4, __pyx_n_s_sqlite_conn, __pyx_n_s_timeout, __pyx_n_s_n, __pyx_n_s_db); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 560, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
-  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_aggressive_busy_handler, 555, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 555, __pyx_L1_error)
+  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_vtfunc_pyx, __pyx_n_s_aggressive_busy_handler, 560, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 560, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -6705,11 +6797,11 @@ static int __pyx_pymod_exec_vtfunc(PyObject *__pyx_pyinit_module)
   /*--- Type init code ---*/
   __pyx_vtabptr_6vtfunc__TableFunctionImpl = &__pyx_vtable_6vtfunc__TableFunctionImpl;
   __pyx_vtable_6vtfunc__TableFunctionImpl.create_module = (PyObject *(*)(struct __pyx_obj_6vtfunc__TableFunctionImpl *, pysqlite_Connection *))__pyx_f_6vtfunc_18_TableFunctionImpl_create_module;
-  if (PyType_Ready(&__pyx_type_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 458, __pyx_L1_error)
   __pyx_type_6vtfunc__TableFunctionImpl.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_6vtfunc__TableFunctionImpl.tp_dict, __pyx_vtabptr_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
-  if (PyObject_SetAttrString(__pyx_m, "_TableFunctionImpl", (PyObject *)&__pyx_type_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_6vtfunc__TableFunctionImpl.tp_dict, __pyx_vtabptr_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 458, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "_TableFunctionImpl", (PyObject *)&__pyx_type_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 458, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_6vtfunc__TableFunctionImpl) < 0) __PYX_ERR(0, 458, __pyx_L1_error)
   __pyx_ptype_6vtfunc__TableFunctionImpl = &__pyx_type_6vtfunc__TableFunctionImpl;
   /*--- Type import code ---*/
   __pyx_ptype_7cpython_4type_type = __Pyx_ImportType(__Pyx_BUILTIN_MODULE_NAME, "type", 
@@ -6738,148 +6830,157 @@ static int __pyx_pymod_exec_vtfunc(PyObject *__pyx_pyinit_module)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_traceback, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":501
+  /* "vtfunc.pyx":505
  * 
  * 
  * class TableFunction(object):             # <<<<<<<<<<<<<<
  *     """
  *     Implements a table-valued function (eponymous-only virtual table) in
  */
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_tuple__9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 501, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_tuple__9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_tuple__9, __pyx_n_s_TableFunction, __pyx_n_s_TableFunction, (PyObject *) NULL, __pyx_n_s_vtfunc, __pyx_kp_s_Implements_a_table_valued_funct); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 501, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_tuple__9, __pyx_n_s_TableFunction, __pyx_n_s_TableFunction, (PyObject *) NULL, __pyx_n_s_vtfunc, __pyx_kp_s_Implements_a_table_valued_funct); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 505, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "vtfunc.pyx":519
+  /* "vtfunc.pyx":523
  *     a `StopIteration` to signal no more results.
  *     """
  *     columns = None             # <<<<<<<<<<<<<<
  *     params = None
  *     name = None
  */
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_columns, Py_None) < 0) __PYX_ERR(0, 519, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_columns, Py_None) < 0) __PYX_ERR(0, 523, __pyx_L1_error)
 
-  /* "vtfunc.pyx":520
+  /* "vtfunc.pyx":524
  *     """
  *     columns = None
  *     params = None             # <<<<<<<<<<<<<<
  *     name = None
- *     _ncols = None
+ *     print_tracebacks = True
  */
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_params, Py_None) < 0) __PYX_ERR(0, 520, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_params, Py_None) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
 
-  /* "vtfunc.pyx":521
+  /* "vtfunc.pyx":525
  *     columns = None
  *     params = None
  *     name = None             # <<<<<<<<<<<<<<
+ *     print_tracebacks = True
+ *     _ncols = None
+ */
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_name, Py_None) < 0) __PYX_ERR(0, 525, __pyx_L1_error)
+
+  /* "vtfunc.pyx":526
+ *     params = None
+ *     name = None
+ *     print_tracebacks = True             # <<<<<<<<<<<<<<
  *     _ncols = None
  * 
  */
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_name, Py_None) < 0) __PYX_ERR(0, 521, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_print_tracebacks, Py_True) < 0) __PYX_ERR(0, 526, __pyx_L1_error)
 
-  /* "vtfunc.pyx":522
- *     params = None
+  /* "vtfunc.pyx":527
  *     name = None
+ *     print_tracebacks = True
  *     _ncols = None             # <<<<<<<<<<<<<<
  * 
  *     @classmethod
  */
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_ncols, Py_None) < 0) __PYX_ERR(0, 522, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_ncols, Py_None) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
 
-  /* "vtfunc.pyx":525
+  /* "vtfunc.pyx":530
  * 
  *     @classmethod
  *     def register(cls, conn):             # <<<<<<<<<<<<<<
  *         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
  *         impl.create_module(<pysqlite_Connection *>conn)
  */
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_1register, __Pyx_CYFUNCTION_CLASSMETHOD, __pyx_n_s_TableFunction_register, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 525, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_1register, __Pyx_CYFUNCTION_CLASSMETHOD, __pyx_n_s_TableFunction_register, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 530, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "vtfunc.pyx":524
+  /* "vtfunc.pyx":529
  *     _ncols = None
  * 
  *     @classmethod             # <<<<<<<<<<<<<<
  *     def register(cls, conn):
  *         cdef _TableFunctionImpl impl = _TableFunctionImpl(cls)
  */
-  __pyx_t_4 = __Pyx_Method_ClassMethod(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Method_ClassMethod(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 529, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_register, __pyx_t_4) < 0) __PYX_ERR(0, 525, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_register, __pyx_t_4) < 0) __PYX_ERR(0, 530, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "vtfunc.pyx":530
+  /* "vtfunc.pyx":535
  *         cls._ncols = len(cls.columns)
  * 
  *     def initialize(self, **filters):             # <<<<<<<<<<<<<<
  *         raise NotImplementedError
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_3initialize, 0, __pyx_n_s_TableFunction_initialize, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 530, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_3initialize, 0, __pyx_n_s_TableFunction_initialize, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 535, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_initialize, __pyx_t_4) < 0) __PYX_ERR(0, 530, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_initialize, __pyx_t_4) < 0) __PYX_ERR(0, 535, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "vtfunc.pyx":533
+  /* "vtfunc.pyx":538
  *         raise NotImplementedError
  * 
  *     def iterate(self, idx):             # <<<<<<<<<<<<<<
  *         raise NotImplementedError
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_5iterate, 0, __pyx_n_s_TableFunction_iterate, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 533, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_5iterate, 0, __pyx_n_s_TableFunction_iterate, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 538, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_iterate, __pyx_t_4) < 0) __PYX_ERR(0, 533, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_iterate, __pyx_t_4) < 0) __PYX_ERR(0, 538, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "vtfunc.pyx":537
+  /* "vtfunc.pyx":542
  * 
  *     @classmethod
  *     def get_table_columns_declaration(cls):             # <<<<<<<<<<<<<<
  *         cdef list accum = []
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_7get_table_columns_declaration, __Pyx_CYFUNCTION_CLASSMETHOD, __pyx_n_s_TableFunction_get_table_columns, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 537, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_6vtfunc_13TableFunction_7get_table_columns_declaration, __Pyx_CYFUNCTION_CLASSMETHOD, __pyx_n_s_TableFunction_get_table_columns, NULL, __pyx_n_s_vtfunc, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 542, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
 
-  /* "vtfunc.pyx":536
+  /* "vtfunc.pyx":541
  *         raise NotImplementedError
  * 
  *     @classmethod             # <<<<<<<<<<<<<<
  *     def get_table_columns_declaration(cls):
  *         cdef list accum = []
  */
-  __pyx_t_3 = __Pyx_Method_ClassMethod(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 536, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Method_ClassMethod(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_get_table_columns_declaration, __pyx_t_3) < 0) __PYX_ERR(0, 537, __pyx_L1_error)
+  if (PyObject_SetItem(__pyx_t_2, __pyx_n_s_get_table_columns_declaration, __pyx_t_3) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "vtfunc.pyx":501
+  /* "vtfunc.pyx":505
  * 
  * 
  * class TableFunction(object):             # <<<<<<<<<<<<<<
  *     """
  *     Implements a table-valued function (eponymous-only virtual table) in
  */
-  __pyx_t_3 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_TableFunction, __pyx_tuple__9, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 501, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_TableFunction, __pyx_tuple__9, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 505, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TableFunction, __pyx_t_3) < 0) __PYX_ERR(0, 501, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TableFunction, __pyx_t_3) < 0) __PYX_ERR(0, 505, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "vtfunc.pyx":555
+  /* "vtfunc.pyx":560
  * 
  * 
  * def aggressive_busy_handler(sqlite_conn, timeout=5000):             # <<<<<<<<<<<<<<
  *     cdef:
  *         int n = timeout
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6vtfunc_1aggressive_busy_handler, NULL, __pyx_n_s_vtfunc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 555, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6vtfunc_1aggressive_busy_handler, NULL, __pyx_n_s_vtfunc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 560, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_aggressive_busy_handler, __pyx_t_1) < 0) __PYX_ERR(0, 555, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_aggressive_busy_handler, __pyx_t_1) < 0) __PYX_ERR(0, 560, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "vtfunc.pyx":1
