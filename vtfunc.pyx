@@ -5,6 +5,8 @@ from libc.stdlib cimport rand
 from libc.string cimport memcpy
 from libc.string cimport memset
 
+import traceback
+
 
 cdef struct sqlite3_index_constraint:
     int iColumn
@@ -194,6 +196,10 @@ ctypedef struct peewee_cursor:
     bint stopped  # Did we run out of results?
 
 
+cdef void sqlite_error(sqlite3_context *ctx, err_msg):
+    sqlite3_result_error(ctx, encode(err_msg), -1)
+
+
 cdef int pwConnect(sqlite3 *db, void *pAux, int argc, char **argv,
                    sqlite3_vtab **ppVtab, char **pzErr) with gil:
     cdef:
@@ -236,7 +242,13 @@ cdef int pwOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) with gil:
     memset(<char *>pCur, 0, sizeof(pCur[0]))
     ppCursor[0] = &(pCur.base)
     pCur.idx = 0
-    table_func = table_func_cls()
+    try:
+        table_func = table_func_cls()
+    except:
+        traceback.print_exc()
+        sqlite3_free(pCur)
+        return SQLITE_ERROR
+
     Py_INCREF(table_func)
     pCur.table_func = <void *>table_func
     pCur.stopped = False
@@ -261,11 +273,13 @@ cdef int pwNext(sqlite3_vtab_cursor *pBase) with gil:
     if pCur.row_data:
         Py_DECREF(<tuple>pCur.row_data)
 
+    pCur.row_data = NULL
     try:
         result = tuple(table_func.iterate(pCur.idx))
     except StopIteration:
         pCur.stopped = True
     except:
+        traceback.print_exc()
         return SQLITE_ERROR
     else:
         Py_INCREF(result)
@@ -288,6 +302,10 @@ cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
         sqlite3_result_int64(ctx, <sqlite3_int64>pCur.idx)
         return SQLITE_OK
 
+    if not pCur.row_data:
+        sqlite_error(ctx, 'error: row data not available.')
+        return SQLITE_ERROR
+
     row_data = <tuple>pCur.row_data
     value = row_data[iCol]
     if value is None:
@@ -306,10 +324,7 @@ cdef int pwColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
     elif isinstance(value, bool):
         sqlite3_result_int(ctx, int(value))
     else:
-        sqlite3_result_error(
-            ctx,
-            encode('Unsupported type %s' % type(value)),
-            -1)
+        sqlite_error(ctx, 'Unsupported type %s' % type(value))
         return SQLITE_ERROR
 
     return SQLITE_OK
@@ -371,6 +386,7 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
     try:
         table_func.initialize(**query)
     except:
+        traceback.print_exc()
         return SQLITE_ERROR
 
     pCur.stopped = False
@@ -378,7 +394,8 @@ cdef int pwFilter(sqlite3_vtab_cursor *pBase, int idxNum,
         row_data = tuple(table_func.iterate(0))
     except StopIteration:
         pCur.stopped = True
-    except:
+    except Exception as exc:
+        traceback.print_exc()
         return SQLITE_ERROR
     else:
         Py_INCREF(row_data)
