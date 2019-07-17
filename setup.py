@@ -26,7 +26,7 @@ extension = Extension(
 
 setup(
     name='vtfunc',
-    version='0.3.4',
+    version='0.4.0',
     description='Tabular user-defined functions for SQLite3.',
     url='https://github.com/coleifer/sqlite-vtfunc',
     dependency_links=[
