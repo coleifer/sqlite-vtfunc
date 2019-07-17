@@ -126,8 +126,6 @@ cdef extern from "sqlite3.h":
     cdef int SQLITE_BLOB    = 4
     cdef int SQLITE_NULL    = 5
 
-    cdef int SQLITE_CONSTRAINT   # Abort due to constraint violation
-
     ctypedef void (*sqlite3_destructor_type)(void*)
 
     cdef int sqlite3_create_function(
@@ -169,8 +167,12 @@ cdef extern from "sqlite3.h":
     cdef void sqlite3_free(void *)
 
     # Misc.
-    cdef int sqlite3_busy_handler(sqlite3 *db, int(*)(void *, int), void *)
-    cdef int sqlite3_sleep(int ms)
+    cdef const char sqlite3_version[]
+
+
+cdef int SQLITE_CONSTRAINT = 19  # Abort due to constraint violation.
+
+USE_SQLITE_CONSTRAINT = sqlite3_version[:4] >= b'3.26'
 
 
 cdef extern from "_pysqlite/connection.h":
@@ -522,9 +524,12 @@ cdef int cyBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         idxStr[len(joinedCols)] = b'\x00'
         pIdxInfo.idxStr = idxStr
         pIdxInfo.needToFreeIdxStr = 0
-        return SQLITE_OK
-
-    return SQLITE_CONSTRAINT
+    elif USE_SQLITE_CONSTRAINT:
+        return SQLITE_CONSTRAINT
+    else:
+        pIdxInfo.estimatedCost = DBL_MAX
+        pIdxInfo.estimatedRows = 100000
+    return SQLITE_OK
 
 
 cdef class _TableFunctionImpl(object):
