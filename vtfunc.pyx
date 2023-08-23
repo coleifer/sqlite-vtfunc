@@ -297,7 +297,7 @@ ctypedef struct cysqlite_cursor:
 # We define an xConnect function, but leave xCreate NULL so that the
 # table-function can be called eponymously.
 cdef int cyConnect(sqlite3 *db, void *pAux, int argc, const char *const*argv,
-                   sqlite3_vtab **ppVtab, char **pzErr) with gil:
+                   sqlite3_vtab **ppVtab, char **pzErr) noexcept with gil:
     cdef:
         int rc
         object table_func_cls = <object>pAux
@@ -318,7 +318,7 @@ cdef int cyConnect(sqlite3 *db, void *pAux, int argc, const char *const*argv,
     return rc
 
 
-cdef int cyDisconnect(sqlite3_vtab *pBase) with gil:
+cdef int cyDisconnect(sqlite3_vtab *pBase) noexcept with gil:
     cdef:
         cysqlite_vtab *pVtab = <cysqlite_vtab *>pBase
         object table_func_cls = <object>(pVtab.table_func_cls)
@@ -330,7 +330,7 @@ cdef int cyDisconnect(sqlite3_vtab *pBase) with gil:
 
 # The xOpen method is used to initialize a cursor. In this method we
 # instantiate the TableFunction class and zero out a new cursor for iteration.
-cdef int cyOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) with gil:
+cdef int cyOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) noexcept with gil:
     cdef:
         cysqlite_vtab *pVtab = <cysqlite_vtab *>pBase
         cysqlite_cursor *pCur = <cysqlite_cursor *>0
@@ -354,7 +354,7 @@ cdef int cyOpen(sqlite3_vtab *pBase, sqlite3_vtab_cursor **ppCursor) with gil:
     return SQLITE_OK
 
 
-cdef int cyClose(sqlite3_vtab_cursor *pBase) with gil:
+cdef int cyClose(sqlite3_vtab_cursor *pBase) noexcept with gil:
     cdef:
         cysqlite_cursor *pCur = <cysqlite_cursor *>pBase
         object table_func = <object>pCur.table_func
@@ -365,7 +365,7 @@ cdef int cyClose(sqlite3_vtab_cursor *pBase) with gil:
 
 # Iterate once, advancing the cursor's index and assigning the row data to the
 # `row_data` field on the cysqlite_cursor struct.
-cdef int cyNext(sqlite3_vtab_cursor *pBase) with gil:
+cdef int cyNext(sqlite3_vtab_cursor *pBase) noexcept with gil:
     cdef:
         cysqlite_cursor *pCur = <cysqlite_cursor *>pBase
         object table_func = <object>pCur.table_func
@@ -394,7 +394,7 @@ cdef int cyNext(sqlite3_vtab_cursor *pBase) with gil:
 
 # Return the requested column from the current row.
 cdef int cyColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
-                  int iCol) with gil:
+                  int iCol) noexcept with gil:
     cdef:
         bytes bval
         cysqlite_cursor *pCur = <cysqlite_cursor *>pBase
@@ -413,7 +413,7 @@ cdef int cyColumn(sqlite3_vtab_cursor *pBase, sqlite3_context *ctx,
     return python_to_sqlite(ctx, row_data[iCol])
 
 
-cdef int cyRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):
+cdef int cyRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid) noexcept:
     cdef:
         cysqlite_cursor *pCur = <cysqlite_cursor *>pBase
     pRowid[0] = <sqlite3_int64>pCur.idx
@@ -421,7 +421,7 @@ cdef int cyRowid(sqlite3_vtab_cursor *pBase, sqlite3_int64 *pRowid):
 
 
 # Return a boolean indicating whether the cursor has been consumed.
-cdef int cyEof(sqlite3_vtab_cursor *pBase):
+cdef int cyEof(sqlite3_vtab_cursor *pBase) noexcept:
     cdef:
         cysqlite_cursor *pCur = <cysqlite_cursor *>pBase
     return 1 if pCur.stopped else 0
@@ -431,7 +431,7 @@ cdef int cyEof(sqlite3_vtab_cursor *pBase):
 # get access to the parameters that the function was called with, and call the
 # TableFunction's `initialize()` function.
 cdef int cyFilter(sqlite3_vtab_cursor *pBase, int idxNum,
-                  const char *idxStr, int argc, sqlite3_value **argv) with gil:
+                  const char *idxStr, int argc, sqlite3_value **argv) noexcept with gil:
     cdef:
         cysqlite_cursor *pCur = <cysqlite_cursor *>pBase
         object table_func = <object>pCur.table_func
@@ -483,7 +483,7 @@ cdef int cyFilter(sqlite3_vtab_cursor *pBase, int idxNum,
 # SQLite will (in some cases, repeatedly) call the xBestIndex method to try and
 # find the best query plan.
 cdef int cyBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
-        with gil:
+        noexcept with gil:
     cdef:
         int i
         int idxNum = 0, nArg = 0
@@ -515,7 +515,7 @@ cdef int cyBestIndex(sqlite3_vtab *pBase, sqlite3_index_info *pIdxInfo) \
         else:
             # Penalize score based on number of missing params.
             pIdxInfo.estimatedCost = <double>10000000000000 * <double>(nParams - nArg)
-            pIdxInfo.estimatedRows = 10 ** (nParams - nArg)
+            pIdxInfo.estimatedRows = 10 * (nParams - nArg)
 
         # Store a reference to the columns in the index info structure.
         joinedCols = encode(','.join(columns))
